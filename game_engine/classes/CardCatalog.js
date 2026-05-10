@@ -1,6 +1,9 @@
+const CardEffect = require("./Card.js").CardEffect;
+const Card = require("./Card.js").Card;
+
 const cardCatalog = new Map([
-  [1, new Card("Sacrificial Pawn", 0, 1, 0, "assets/cards/card1.png", [CardEffect.SACRIFICE_BASE])], // Can be picked instead of drawing a random card
-  [2, new Card("Energy Core", 1, 2, 0, "assets/cards/card2.png", [CardEffect.SACRIFICE_ENERGY])],  // Gives 3 energy on sacrifice
+  [1, new Card("Sacrificial Pawn", 0, 1, 0, "assets/cards/card1.png", [])], // Can be picked instead of drawing a random card
+  [2, new Card("Energy Core", 1, 2, 0, "assets/cards/card2.png", [CardEffect.SACRIFICE_BIG])],  // Gives 3 energy on sacrifice
   [3, new Card("Basic Fighter", 1, 1, 2, "assets/cards/card3.png", [])],
   [4, new Card("Sturdy Defender", 1, 4, 1, "assets/cards/card4.png", [])],
   [5, new Card("Wall", 1, 6, 0, "assets/cards/card5.png", [])],
@@ -9,6 +12,7 @@ const cardCatalog = new Map([
   [8, new Card("Bruiser", 2, 2, 3, "assets/cards/card8.png", [])],
   [9, new Card("Tough Brawler", 2, 3, 2, "assets/cards/card9.png", [])],
   [10, new Card("Swarm Mother", 2, 2, 1, "assets/cards/card10.png", [CardEffect.SPAWNER])],           // Spawns 1hp 1dmg units in adjacent tiles if possible
+  [101, new Card("Swarm Spawn", 999, 1, 1, "assets/cards/card101.png", [])],                          // Spawned by swarm mothers effect, can't be found in deck
   [11, new Card("Assassin", 2, 2, 1, "assets/cards/card11.png", [CardEffect.INSTAKILL])],             // Instantly kills attacked card, deals 1 dmg to enemy player
   [12, new Card("Healer", 2, 6, 1, "assets/cards/card12.png", [CardEffect.BUFF_HP])],                 // Adds +2 hp to adjacent cards
   [13, new Card("Flying Assaulter", 2, 2, 2, "assets/cards/card13.png", [CardEffect.FLY])],           // Ignores cards, targets enemy player directly
@@ -21,3 +25,5 @@ const cardCatalog = new Map([
   [20, new Card("Boss", 4, 8, 5, "assets/cards/card20.png", [])],
   [21, new Card("Zero Cost Hitter", 0, 1, 1, "assets/cards/card21.png", [])]
 ]);
+
+module.exports = cardCatalog;
