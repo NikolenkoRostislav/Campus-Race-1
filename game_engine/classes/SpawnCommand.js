@@ -1,4 +1,5 @@
 const CardType = require("./Card.js").CardType;
+const CardData = require("./CardData.js");
 
 class SpawnCommand {
     constructor(game, x, side, card, cardPlacementLog) {
@@ -50,7 +51,7 @@ class SpawnCommandBuffDMG extends SpawnCommand {
                 this.cardPlacementLog.push({
                     Action: "CARD_DMG_BUFFED",
                     TargetCoord: `${newX}:${this.side}`,
-                    NewValue: buffedCard.dmg + 1
+                    NewValue: buffedCard.dmg
                 });
             }
         };
@@ -74,7 +75,7 @@ class SpawnCommandBuffDMGStrong extends SpawnCommand {
                 this.cardPlacementLog.push({
                     Action: "CARD_DMG_BUFFED",
                     TargetCoord: `${newX}:${this.side}`,
-                    NewValue: buffedCard.dmg + 2
+                    NewValue: buffedCard.dmg
                 });
             }
         };
@@ -98,7 +99,7 @@ class SpawnCommandBuffHP extends SpawnCommand {
                 this.cardPlacementLog.push({
                     Action: "CARD_HP_BUFFED",
                     TargetCoord: `${newX}:${this.side}`,
-                    NewValue: buffedCard.hp + 1
+                    NewValue: buffedCard.hp
                 });
             }
         };

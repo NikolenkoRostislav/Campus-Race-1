@@ -68,7 +68,7 @@ class AttackCommand {
 
         if (defender.isDead()) {
             this.game.gameState.gameBoard.set(
-                this.x,
+                x,
                 this.defendingSide,
                 null
             );
@@ -102,12 +102,23 @@ class TripleAttackCommand extends AttackCommand {
 
 class FlyAttackCommand extends AttackCommand {
     execute() {
+        this.battleLog.push({
+            Action: "ATTACK",
+            AttackerCoord: `${this.x}:${this.attackingSide}`,
+            TargetCoord: `${this.x}:${this.defendingSide}`
+        });
         this.attackPlayer();
     }
 }
 
 class InstakillAttackCommand extends AttackCommand {
     execute() {
+        this.battleLog.push({
+            Action: "ATTACK",
+            AttackerCoord: `${this.x}:${this.attackingSide}`,
+            TargetCoord: `${this.x}:${this.defendingSide}`
+        });
+
         const defender = this.game.gameState.gameBoard.get(
             this.x,
             this.defendingSide

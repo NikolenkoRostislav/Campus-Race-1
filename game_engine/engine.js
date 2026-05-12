@@ -3,6 +3,7 @@ const CardCatalog = require("./classes/CardCatalog.js");
 const CardData = require("./classes/CardData.js");
 const { AttackCommand, AttackCommandRegistry } = require("./classes/AttackCommand.js");
 const { SpawnCommand, SpawnCommandRegistry } = require("./classes/SpawnCommand.js");
+const { CardType } = require("./classes/Card.js");
 
 class Game {
     constructor() {
@@ -33,7 +34,35 @@ class Game {
         }
     }
 
-    placeCard(x, side, cardID) {
+    sacrificeCard(x, side) {
+        let cardData = this.gameState.gameBoard.get(x, side);
+        if (cardData === null) {
+            return
+        }
+        let sacrificeLog = [{ Action: "CARD_SACRIFICE", TargetCoord: `${x}:${side}` }];
+
+        card = CardCatalog.get(cardData.cardID);
+        this.gameState.gameBoard.set(x, side, null);
+        if (side == 1) {
+            if (card.type === CardType.SACRIFICE_BIG) {
+                this.gameState.player1Info.addEnergy(3);
+                sacrificeLog.push({ Action: "ADD_ENERGY", Player: 1, Amount: 3 });
+            }
+            this.gameState.player1Info.addEnergy(1);
+            sacrificeLog.push({ Action: "ADD_ENERGY", Player: 1, Amount: 1 });
+        } else {
+            if (card.type === CardType.SACRIFICE_BIG) {
+                this.gameState.player2Info.addEnergy(3);
+                sacrificeLog.push({ Action: "ADD_ENERGY", Player: 2, Amount: 3 });
+                return
+            }
+            this.gameState.player2Info.addEnergy(1);
+            sacrificeLog.push({ Action: "ADD_ENERGY", Player: 2, Amount: 1 });
+        }
+        return sacrificeLog
+    }
+
+    placeCard(x, side, cardID) { //TODO: add card in deck check
         let cardPlacementLog = []
         let card = CardCatalog.get(cardID);
         let cardData = new CardData(cardID);
@@ -66,7 +95,8 @@ class Game {
             const attacker = this.gameState.gameBoard.get(x, side);
             if (!attacker) continue
 
-            const CommandClass = AttackCommandRegistry[attacker.type] || AttackCommand;
+            let card = CardCatalog.get(attacker.cardID);
+            const CommandClass = AttackCommandRegistry[card.type] || AttackCommand;
             let attackCommand = new CommandClass(this, x, side, battleLog);
             attackCommand.execute();
             battleLog = attackCommand.battleLog;
