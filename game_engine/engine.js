@@ -43,13 +43,13 @@ class Game {
                 case CardType.FLY:
                     attackCommand = new FlyAttackCommand(this, x, side, battleLog);
                     break;
-                case CardType.LEFT_RIGHT:
+                case CardType.LEFT_RIGHT_ATTACK:
                     attackCommand = new LeftRightAttackCommand(this, x, side, battleLog);
                     break;
-                case CardType.DOUBLE:
+                case CardType.DOUBLE_ATTACK:
                     attackCommand = new DoubleAttackCommand(this, x, side, battleLog);
                     break;
-                case CardType.TRIPLE:
+                case CardType.THREE_TILE_ATTACK:
                     attackCommand = new TripleAttackCommand(this, x, side, battleLog);
                     break;
                 case CardType.INSTAKILL:
