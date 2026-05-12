@@ -1,3 +1,5 @@
+const CardType = require("./Card.js").CardType;
+
 class AttackCommand {
     constructor(game, x, attackingSide, battleLog) {
         this.game = game;
@@ -120,4 +122,12 @@ class InstakillAttackCommand extends AttackCommand {
     }
 }
 
-module.exports = { AttackCommand, FlyAttackCommand, InstakillAttackCommand, DoubleAttackCommand, LeftRightAttackCommand, TripleAttackCommand };
+const AttackCommandRegistry = {
+    [CardType.FLY]: FlyAttackCommand,
+    [CardType.LEFT_RIGHT_ATTACK]: LeftRightAttackCommand,
+    [CardType.DOUBLE_ATTACK]: DoubleAttackCommand,
+    [CardType.THREE_TILE_ATTACK]: TripleAttackCommand,
+    [CardType.INSTAKILL]: InstakillAttackCommand,
+};
+
+module.exports = { AttackCommand, AttackCommandRegistry };
