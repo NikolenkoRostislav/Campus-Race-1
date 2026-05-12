@@ -1,4 +1,5 @@
-const CardEffect = Object.freeze({
+const CardType = Object.freeze({
+    BASIC: "basic",
     LEFT_RIGHT_ATTACK: "left-right-attack",
     BUFF_DMG: "buff-dmg",
     SPAWNER: "spawner",
@@ -12,14 +13,17 @@ const CardEffect = Object.freeze({
 });
 
 class Card {
-    constructor(name, cost, hp, dmg, imgSrc, effects = []) {
+    constructor(name, cost, hp, dmg, imgSrc, type) {
         this.name = name;
         this.cost = cost;
         this.hp = hp;
         this.dmg = dmg;
         this.imgSrc = imgSrc;
-        this.effects = effects;
+        this.type = type;
+        if (!this.type) {
+            this.type = CardType.BASIC;
+        }
     }
 }
 
-module.exports = { Card, CardEffect };
+module.exports = { Card, CardType };
