@@ -13,7 +13,6 @@ class Game {
 
         this.gameBoard = new GameBoard();
         this.turn = 0;
-        this.phase = 1;
     }
 
     getPlayer(side) {
@@ -30,18 +29,9 @@ class Game {
         return playerDamageLog
     }
 
-    playerDie(side) {
-        console.log("Player " + side + " lost the game"); //placeholder
-    }
-
-    nextPhase() {
+    wipeEnergy() {
         this.player1Info.clearEnergy();
         this.player2Info.clearEnergy();
-        this.phase++;
-        if (this.phase > 6) {
-            this.phase = 1;
-            this.turn++;
-        }
     }
 
     sacrificeCard(x, side) {
@@ -58,28 +48,27 @@ class Game {
 
     placeCard(x, side, cardID) {
         let card = CardCatalog.get(cardID);
-        console.log("energy: " + this.getPlayer(side).energy)
-        console.log("deck: " + this.getPlayer(side).getDeck())
+        let player = this.getPlayer(side);
         if (
-            this.getPlayer(side).hasCard(cardID) &&
-            this.getPlayer(side).consumeEnergy(card.cost)
+            player.hasCard(cardID) &&
+            player.hasEnergy(card.cost) &&
+            this.gameBoard.placeCard(x, side, cardID)
         ) {
-            this.getPlayer(side).consumeCard(cardID);
-            return this.gameBoard.placeCard(x, side, cardID);
+            player.consumeCard(cardID);
+            player.consumeEnergy(card.cost);
         }
     }
 
-    battle() {
-        let battleLog = [];
-        let side;
+    playerDie(side) {
+        let playerDieLog = {
+            Action: "PLAYER_DIE",
+            Side: side
+        };
+        return playerDieLog
+    }
 
-        if (this.phase == 3) {
-            side = -1;
-        } else if (this.phase == 6) {
-            side = 1;
-        } else {
-            throw new Error("Invalid phase");
-        }
+    battle(side) {
+        let battleLog = [];
 
         for (let x = 1; x <= 4; x++) {
             const attacker = this.gameBoard.get(x, side);
@@ -92,10 +81,10 @@ class Game {
             battleLog = attackCommand.battleLog;
 
             if (this.getPlayer(1).hp <= 0) {
-                this.playerDie(1);
+                battleLog.push(this.playerDie(1));
                 break;
             } else if (this.getPlayer(-1).hp <= 0) {
-                this.playerDie(-1);
+                battleLog.push(this.playerDie(-1));
                 break;
             }
         }

@@ -2,28 +2,28 @@ const CardType = require("./Card.js").CardType;
 const Card = require("./Card.js").Card;
 
 const cardCatalog = new Map([
-  [1, new Card("Sacrificial Pawn", 0, 1, 0, "assets/cards/card1.png",)], // Can be picked instead of drawing a random card
-  [2, new Card("Energy Core", 1, 2, 0, "assets/cards/card2.png", CardType.SACRIFICE_BIG)],  // Gives 3 energy on sacrifice
-  [3, new Card("Basic Fighter", 1, 1, 2, "assets/cards/card3.png",)],
-  [4, new Card("Sturdy Defender", 1, 4, 1, "assets/cards/card4.png",)],
-  [5, new Card("Wall", 1, 6, 0, "assets/cards/card5.png",)],
-  [6, new Card("Flanker", 1, 1, 1, "assets/cards/card6.png", CardType.LEFT_RIGHT_ATTACK)],       // Attacks right and left tiles instead of front
-  [7, new Card("Commander", 1, 1, 1, "assets/cards/card7.png", CardType.BUFF_DMG)],              // Gives adjacent units +1 damage on placement
-  [8, new Card("Bruiser", 2, 2, 3, "assets/cards/card8.png",)],
-  [9, new Card("Tough Brawler", 2, 3, 2, "assets/cards/card9.png",)],
-  [10, new Card("Swarm Mother", 2, 2, 1, "assets/cards/card10.png", CardType.SPAWNER)],           // Spawns 1hp 1dmg units in adjacent tiles if possible
-  [101, new Card("Swarm Spawn", 0, 1, 1, "assets/cards/card101.png",)],                          // Spawned by swarm mothers effect, can't be found in deck
-  [11, new Card("Assassin", 2, 2, 1, "assets/cards/card11.png", CardType.INSTAKILL)],             // Instantly kills attacked card, deals 1 dmg to enemy player
-  [12, new Card("Healer", 2, 6, 1, "assets/cards/card12.png", CardType.BUFF_HP)],                 // Adds +2 hp to adjacent cards
-  [13, new Card("Flying Assaulter", 2, 2, 2, "assets/cards/card13.png", CardType.FLY)],           // Ignores cards, targets enemy player directly
-  [14, new Card("Little Flyer", 1, 1, 1, "assets/cards/card14.png", CardType.FLY)],               // Ignores cards, targets enemy player directly
-  [15, new Card("Sturdy Flyer", 2, 4, 1, "assets/cards/card15.png", CardType.FLY)],               // Ignores cards, targets enemy player directly
-  [16, new Card("Heavy Hitter", 3, 6, 4, "assets/cards/card16.png",)],
-  [17, new Card("Double Striker", 3, 5, 2, "assets/cards/card17.png", CardType.DOUBLE_ATTACK)],   // Attacks twice in a row
-  [18, new Card("Cleaver", 3, 2, 2, "assets/cards/card18.png", CardType.THREE_TILE_ATTACK)],      // Attacks front, left, and right enemy tiles
-  [19, new Card("General", 3, 4, 1, "assets/cards/card19.png", CardType.BUFF_DMG_STRONG)],        // Adds +2 damage to adjacent cards (assuming +2 for "strong")
-  [20, new Card("Boss", 4, 8, 5, "assets/cards/card20.png",)],
-  [21, new Card("Zero Cost Hitter", 0, 1, 1, "assets/cards/card21.png",)]
+  [1, new Card(0, 1, 0)],                               // Can be picked instead of drawing a random card
+  [2, new Card(1, 2, 0, CardType.SACRIFICE_BIG)],       // Gives 3 energy on sacrifice
+  [3, new Card(1, 1, 2)],
+  [4, new Card(1, 4, 1)],
+  [5, new Card(1, 6, 0)],
+  [6, new Card(1, 1, 1, CardType.LEFT_RIGHT_ATTACK)],   // Attacks right and left tiles instead of front
+  [7, new Card(1, 1, 1, CardType.BUFF_DMG)],            // Gives adjacent units +1 damage on placement
+  [8, new Card(2, 2, 3)],
+  [9, new Card(2, 3, 2)],
+  [10, new Card(2, 2, 1, CardType.SPAWNER)],            // Spawns 1hp 1dmg units in adjacent tiles if possible
+  [101, new Card(0, 1, 1)],                             // Spawned by swarm mothers effect, can't be found in deck
+  [11, new Card(2, 2, 1, CardType.INSTAKILL)],          // Instantly kills attacked card, deals 1 dmg to enemy player
+  [12, new Card(2, 6, 1, CardType.BUFF_HP)],            // Adds +2 hp to adjacent cards
+  [13, new Card(2, 2, 2, CardType.FLY)],                // Ignores cards, targets enemy player directly
+  [14, new Card(1, 1, 1, CardType.FLY)],                // Ignores cards, targets enemy player directly
+  [15, new Card(2, 4, 1, CardType.FLY)],                // Ignores cards, targets enemy player directly
+  [16, new Card(3, 6, 4)],
+  [17, new Card(3, 5, 2, CardType.DOUBLE_ATTACK)],      // Attacks twice in a row
+  [18, new Card(3, 2, 2, CardType.THREE_TILE_ATTACK)],  // Attacks front, left, and right enemy tiles
+  [19, new Card(3, 4, 1, CardType.BUFF_DMG_STRONG)],    // Adds +2 damage to adjacent cards (assuming +2 for "strong")
+  [20, new Card(4, 8, 5)],
+  [21, new Card(0, 1, 1)]
 ]);
 
 module.exports = cardCatalog;

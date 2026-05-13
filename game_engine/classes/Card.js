@@ -13,12 +13,10 @@ const CardType = Object.freeze({
 });
 
 class Card {
-    constructor(name, cost, hp, dmg, imgSrc, type) {
-        this.name = name;
+    constructor(cost, hp, dmg, type) {
         this.cost = cost;
         this.hp = hp;
         this.dmg = dmg;
-        this.imgSrc = imgSrc;
         this.type = type;
         if (!this.type) {
             this.type = CardType.BASIC;

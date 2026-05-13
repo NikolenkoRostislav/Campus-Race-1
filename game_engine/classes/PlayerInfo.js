@@ -15,19 +15,30 @@ class PlayerInfo {
         this.energy += energy;
     }
 
+    hasEnoughEnergy(energy) {
+        return this.energy >= energy;
+    }
+
     consumeEnergy(energy) {
-        if (this.energy - energy < 0) {
-            return false
-        }
+        if (this.energy - energy < 0) return false
+
         this.energy -= energy;
+        return true
+    }
+
+    hasCard(cardID) {
+        return this.deck.includes(cardID);
+    }
+
+    consumeCard(cardID) {
+        if (!this.hasCard(cardID)) return false
+        this.deck.splice(this.deck.indexOf(cardID), 1);
         return true
     }
 
     drawCard(random) {
         let cardID = 1
-        if (random) {
-            cardID = Math.floor(Math.random() * 20) + 2;
-        }
+        if (random) cardID = Math.floor(Math.random() * 20) + 2;
 
         this.deck.push(cardID);
     }
@@ -41,16 +52,6 @@ class PlayerInfo {
 
     getDeck() {
         return this.deck
-    }
-
-    hasCard(cardID) {
-        return this.deck.includes(cardID);
-    }
-
-    consumeCard(cardID) {
-        if (!this.hasCard(cardID)) return false
-        this.deck.splice(this.deck.indexOf(cardID), 1);
-        return true
     }
 
     getDamage(dmg) {

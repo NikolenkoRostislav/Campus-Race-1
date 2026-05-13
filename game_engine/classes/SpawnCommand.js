@@ -22,10 +22,10 @@ class SpawnCommandBuffDMG extends SpawnCommand {
     execute() {
         const validX = [1, 2, 3, 4];
 
-        const tryBuff = (newX) => {
-            if (!validX.includes(newX)) return;
+        const tryBuff = (x) => {
+            if (!validX.includes(x)) return;
 
-            const buffedCard = this.gameBoard.get(newX, this.side);
+            const buffedCard = this.gameBoard.get(x, this.side);
 
             if (buffedCard !== null) {
                 buffedCard.increaseDamage(1);
@@ -41,10 +41,10 @@ class SpawnCommandBuffDMGStrong extends SpawnCommand {
     execute() {
         const validX = [1, 2, 3, 4];
 
-        const tryBuff = (newX) => {
-            if (!validX.includes(newX)) return;
+        const tryBuff = (x) => {
+            if (!validX.includes(x)) return;
 
-            const buffedCard = this.gameBoard.get(newX, this.side);
+            const buffedCard = this.gameBoard.get(x, this.side);
 
             if (buffedCard !== null) {
                 buffedCard.increaseDamage(2);
@@ -60,10 +60,10 @@ class SpawnCommandBuffHP extends SpawnCommand {
     execute() {
         const validX = [1, 2, 3, 4];
 
-        const tryBuff = (newX) => {
-            if (!validX.includes(newX)) return;
+        const tryBuff = (x) => {
+            if (!validX.includes(x)) return;
 
-            const buffedCard = this.gameBoard.get(newX, this.side);
+            const buffedCard = this.gameBoard.get(x, this.side);
 
             if (buffedCard !== null) {
                 buffedCard.increaseHP(1);
