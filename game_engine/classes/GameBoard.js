@@ -31,17 +31,10 @@ class GameBoard {
             return false;
         }
         this.set(x, side, cardData);
-        let cardPlacementLog = [];
-        cardPlacementLog.push({
-            Action: "CARD_PLACED",
-            TargetCoord: `${x}:${side}`,
-            CardID: cardID
-        });
         const CommandClass = SpawnCommandRegistry[card.type] || SpawnCommand;
         let spawnCommand = new CommandClass(this, x, side, card);
         spawnCommand.execute();
-        //cardPlacementLog = spawnCommand.cardPlacementLog;
-        return cardPlacementLog
+        return true
     }
 
     removeCard(x, side) {

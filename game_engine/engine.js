@@ -47,14 +47,11 @@ class Game {
     sacrificeCard(x, side) {
         let card = CardCatalog.get(cardData.cardID);
         this.gameBoard.removeCard(x, side);
-        let sacrificeLog = [{ Action: "CARD_SACRIFICE", TargetCoord: `${x}:${side}` }];
 
         if (card.type === CardType.SACRIFICE_BIG) {
             this.getPlayer(side).addEnergy(3);
-            sacrificeLog.push({ Action: "ADD_ENERGY", Player: side, Amount: 3 });
         }
         this.getPlayer(side).addEnergy(1);
-        sacrificeLog.push({ Action: "ADD_ENERGY", Player: side, Amount: 1 });
 
         return sacrificeLog
     }

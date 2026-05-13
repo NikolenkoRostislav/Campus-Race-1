@@ -3,7 +3,7 @@ class PlayerInfo {
         this.id = id;
         this.deck = [];
         this.drawStarterDeck();
-        this.hp = 20;
+        this.hp = 10;
         this.energy = 0;
     }
 
@@ -34,7 +34,7 @@ class PlayerInfo {
 
     drawStarterDeck() {
         this.drawCard(false)
-        for (let i = 0; i <= 8; i++) {
+        for (let i = 0; i <= 6; i++) {
             this.drawCard(true)
         }
     }

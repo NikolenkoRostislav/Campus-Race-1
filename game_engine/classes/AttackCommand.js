@@ -63,8 +63,8 @@ class AttackCommand {
 
 class DoubleAttackCommand extends AttackCommand {
     execute() {
-        super.execute();
-        super.execute();
+        this.attackLane(this.x);
+        this.attackLane(this.x);
     }
 }
 
