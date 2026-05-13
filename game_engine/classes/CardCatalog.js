@@ -12,7 +12,7 @@ const cardCatalog = new Map([
   [8, new Card("Bruiser", 2, 2, 3, "assets/cards/card8.png",)],
   [9, new Card("Tough Brawler", 2, 3, 2, "assets/cards/card9.png",)],
   [10, new Card("Swarm Mother", 2, 2, 1, "assets/cards/card10.png", CardType.SPAWNER)],           // Spawns 1hp 1dmg units in adjacent tiles if possible
-  [101, new Card("Swarm Spawn", 999, 1, 1, "assets/cards/card101.png",)],                          // Spawned by swarm mothers effect, can't be found in deck
+  [101, new Card("Swarm Spawn", 0, 1, 1, "assets/cards/card101.png",)],                          // Spawned by swarm mothers effect, can't be found in deck
   [11, new Card("Assassin", 2, 2, 1, "assets/cards/card11.png", CardType.INSTAKILL)],             // Instantly kills attacked card, deals 1 dmg to enemy player
   [12, new Card("Healer", 2, 6, 1, "assets/cards/card12.png", CardType.BUFF_HP)],                 // Adds +2 hp to adjacent cards
   [13, new Card("Flying Assaulter", 2, 2, 2, "assets/cards/card13.png", CardType.FLY)],           // Ignores cards, targets enemy player directly

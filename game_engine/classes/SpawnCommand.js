@@ -1,39 +1,22 @@
-const CardType = require("./Card.js").CardType;
-const CardData = require("./CardData.js");
+const { CardType } = require("./Card.js");
 
 class SpawnCommand {
-    constructor(game, x, side, card, cardPlacementLog) {
-        this.game = game;
+    constructor(gameBoard, x, side, card, cardPlacementLog) {
+        this.gameBoard = gameBoard;
         this.x = x;
         this.side = side;
         this.card = card;
         this.cardPlacementLog = cardPlacementLog;
+        if (!cardPlacementLog) this.cardPlacementLog = [];
     }
 
     execute() { }
 }
+
 class SpawnCommandSummoner extends SpawnCommand {
     execute() {
-        const validX = [1, 2, 3, 4];
-
-        const trySpawn = (newX) => {
-            if (!validX.includes(newX)) return;
-
-            const existing = this.game.gameState.gameBoard.get(newX, this.side);
-
-            if (existing === null) {
-                this.game.gameState.gameBoard.set(newX, this.side, new CardData(101));
-
-                this.cardPlacementLog.push({
-                    Action: "CARD_PLACED",
-                    TargetCoord: `${newX}:${this.side}`,
-                    CardID: 101
-                });
-            }
-        };
-
-        trySpawn(this.x - 1);
-        trySpawn(this.x + 1);
+        this.gameBoard.placeCard(this.x - 1, this.side, 101);
+        this.gameBoard.placeCard(this.x + 1, this.side, 101);
     }
 }
 
@@ -44,7 +27,7 @@ class SpawnCommandBuffDMG extends SpawnCommand {
         const tryBuff = (newX) => {
             if (!validX.includes(newX)) return;
 
-            const buffedCard = this.game.gameState.gameBoard.get(newX, this.side);
+            const buffedCard = this.gameBoard.get(newX, this.side);
 
             if (buffedCard !== null) {
                 buffedCard.increaseDamage(1);
@@ -68,7 +51,7 @@ class SpawnCommandBuffDMGStrong extends SpawnCommand {
         const tryBuff = (newX) => {
             if (!validX.includes(newX)) return;
 
-            const buffedCard = this.game.gameState.gameBoard.get(newX, this.side);
+            const buffedCard = this.gameBoard.get(newX, this.side);
 
             if (buffedCard !== null) {
                 buffedCard.increaseDamage(2);
@@ -92,7 +75,7 @@ class SpawnCommandBuffHP extends SpawnCommand {
         const tryBuff = (newX) => {
             if (!validX.includes(newX)) return;
 
-            const buffedCard = this.game.gameState.gameBoard.get(newX, this.side);
+            const buffedCard = this.gameBoard.get(newX, this.side);
 
             if (buffedCard !== null) {
                 buffedCard.increaseHP(1);

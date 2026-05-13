@@ -26,11 +26,11 @@ function printGraphicBoard(game) {
 
     for (let x = 1; x <= 4; x++) {
         top.push(renderCard(
-            game.gameState.gameBoard.get(x, -1)
+            game.gameBoard.get(x, -1)
         ));
 
         bottom.push(renderCard(
-            game.gameState.gameBoard.get(x, 1)
+            game.gameBoard.get(x, 1)
         ));
     }
 
@@ -42,7 +42,7 @@ function printGraphicBoard(game) {
         );
     };
 
-    console.log(`\nP2 HP: ${game.gameState.player2Info.hp}`);
+    console.log(`\nP2 HP: ${game.getPlayer(-1).hp}`);
     console.log("\n╔═══════════════════════════════════╗");
     console.log("║              PLAYER 1             ║");
     console.log("╠════════╦════════╦════════╦════════╣");
@@ -63,7 +63,7 @@ function printGraphicBoard(game) {
     }
 
     console.log("╚════════╩════════╩════════╩════════╝");
-    console.log(`P1 HP: ${game.gameState.player1Info.hp}\n`);
+    console.log(`P1 HP: ${game.getPlayer(1).hp}\n`);
 }
 
 function printLog(logs, title) {
@@ -77,8 +77,8 @@ function printLog(logs, title) {
 
 console.log("STARTING GAME");
 
-game.gameState.player1Info.energy = 20;
-game.gameState.player2Info.energy = 20;
+game.getPlayer(1).energy = 30;
+game.getPlayer(-1).energy = 30;
 
 printGraphicBoard(game);
 
@@ -90,19 +90,19 @@ console.log("\nPLAYER 1 PLACING CARDS");
 
 // Commander
 let logs = game.placeCard(2, 1, 7);
-printLog(logs, "P1 PLACE COMMANDER");
+// printLog(logs, "P1 PLACE COMMANDER");
 
 // Basic Fighter beside commander
 logs = game.placeCard(1, 1, 3);
-printLog(logs, "P1 PLACE BASIC FIGHTER");
+printLog(logs, "P1 TRIES TO PLACE BASIC FIGHTER");
 
 // Double Striker beside commander
 logs = game.placeCard(3, 1, 17);
-printLog(logs, "P1 PLACE DOUBLE STRIKER");
+printLog(logs, "P1 TRIES TO PLACE DOUBLE STRIKER");
 
 // Healer
 logs = game.placeCard(4, 1, 12);
-printLog(logs, "P1 PLACE HEALER");
+printLog(logs, "P1 TRIES TO PLACE HEALER");
 
 printGraphicBoard(game);
 
@@ -114,19 +114,19 @@ console.log("\nPLAYER -1 PLACING CARDS");
 
 // Swarm Mother
 logs = game.placeCard(2, -1, 10);
-printLog(logs, "P2 PLACE SWARM MOTHER");
+printLog(logs, "P2 TRIES TO PLACE SWARM MOTHER");
 
 // Assassin
 logs = game.placeCard(3, -1, 11);
-printLog(logs, "P2 TRIES TO PLACE ASSASSIN (fails)");
+printLog(logs, "P2 TRIES TO PLACE ASSASSIN");
 
 // Flying unit
 logs = game.placeCard(4, -1, 13);
-printLog(logs, "P2 PLACE FLYER");
+printLog(logs, "P2 TRIES TO PLACE FLYER");
 
 // Wall
 logs = game.placeCard(1, -1, 5);
-printLog(logs, "P2 PLACE WALL");
+printLog(logs, "P2 TRIES TO PLACE WALL");
 
 printGraphicBoard(game);
 
@@ -136,7 +136,7 @@ printGraphicBoard(game);
 
 console.log("\nPLAYER -1 ATTACK PHASE");
 
-game.gameState.phase = 3;
+game.phase = 3;
 
 logs = game.battle();
 
@@ -150,7 +150,7 @@ printGraphicBoard(game);
 
 console.log("\nPLAYER 1 ATTACK PHASE");
 
-game.gameState.phase = 6;
+game.phase = 6;
 
 logs = game.battle();
 
@@ -164,7 +164,7 @@ printGraphicBoard(game);
 
 console.log("\nSECOND ROUND");
 
-game.gameState.phase = 3;
+game.phase = 3;
 
 logs = game.battle();
 

@@ -3,6 +3,9 @@ const session = require("express-session");
 const path = require("path");
 const auth = require("./controllers/authController.js");
 const register = require("./controllers/registrationController.js");
+
+const { NewGame, GetGame } = require("./game_engine/game.js");
+
 require('dotenv').config();
 
 const host = process.env.HOST;
@@ -41,6 +44,28 @@ app.post("/api/login", auth.login);
 app.get("/api/me", auth.me);
 
 app.post("/api/logout", auth.logout);
+
+app.post("/api/game/new", (req, res) => {
+    const roomID = NewGame();
+
+    res.json({
+        success: true,
+        roomID
+    });
+});
+
+app.get("/api/game", (req, res) => {
+    const roomID = req.query.roomID;
+    const game = GetGame(roomID) || {};
+
+    res.json({
+        game: game,
+        board: game.board,
+        player1: game.gameState.getPlayer(1),
+        player2: game.gameState.getPlayer(-1)
+    });
+});
+
 
 app.use((req, res) => {
     res.status(404).sendFile(

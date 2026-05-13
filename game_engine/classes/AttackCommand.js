@@ -7,7 +7,8 @@ class AttackCommand {
         this.attackingSide = attackingSide;
         this.defendingSide = -attackingSide;
         this.battleLog = battleLog;
-        this.attacker = this.game.gameState.gameBoard.get(x, attackingSide);
+        if (!this.battleLog) this.battleLog = []
+        this.attacker = this.game.gameBoard.get(x, attackingSide);
     }
 
     execute() {
@@ -23,7 +24,7 @@ class AttackCommand {
             TargetCoord: `${targetX}:${this.defendingSide}`
         });
 
-        const defender = this.game.gameState.gameBoard.get(
+        const defender = this.game.gameBoard.get(
             targetX,
             this.defendingSide
         );
@@ -37,23 +38,10 @@ class AttackCommand {
     }
 
     attackPlayer() {
-        const newHP = this.game.damagePlayer(
+        this.battleLog.push(this.game.damagePlayer(
             this.defendingSide,
             this.attacker.dmg
-        );
-
-        this.battleLog.push({
-            Action: "PLAYER_HP_UPDATE",
-            Side: this.defendingSide,
-            NewHP: newHP
-        });
-
-        if (newHP <= 0) {
-            this.battleLog.push({ Action: "PLAYER_DIE", Side: this.defendingSide });
-            return;
-        }
-
-        return;
+        ));
     }
 
     attackCard(x, defender, damage) {
@@ -67,12 +55,7 @@ class AttackCommand {
         });
 
         if (defender.isDead()) {
-            this.game.gameState.gameBoard.set(
-                x,
-                this.defendingSide,
-                null
-            );
-
+            this.game.gameBoard.removeCard(x, this.defendingSide);
             this.battleLog.push({ Action: "CARD_DIE", TargetCoord: `${x}:${this.defendingSide}` });
         }
     }
@@ -119,7 +102,7 @@ class InstakillAttackCommand extends AttackCommand {
             TargetCoord: `${this.x}:${this.defendingSide}`
         });
 
-        const defender = this.game.gameState.gameBoard.get(
+        const defender = this.game.gameBoard.get(
             this.x,
             this.defendingSide
         );
