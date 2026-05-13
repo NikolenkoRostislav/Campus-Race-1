@@ -58,12 +58,7 @@ app.get("/api/game", (req, res) => {
     const roomID = req.query.roomID;
     const game = GetGame(roomID) || {};
 
-    res.json({
-        game: game,
-        board: game.board,
-        player1: game.gameState.getPlayer(1),
-        player2: game.gameState.getPlayer(-1)
-    });
+    res.json({ game: game });
 });
 
 
