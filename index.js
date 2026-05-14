@@ -4,8 +4,8 @@ const path = require("path");
 
 const auth = require("./controllers/authController.js");
 const register = require("./controllers/registrationController.js");
-const LobbyController = require("./controllers/lobbyController.js");
-const GameController = require("./controllers/gameController.js");
+const lobby = require("./controllers/lobbyController.js");
+const game = require("./controllers/gameController.js");
 
 require("dotenv").config();
 
@@ -56,23 +56,23 @@ app.post("/api/logout", auth.logout);
 // --------------------
 // LOBBY ROUTES
 // --------------------
-app.post("/api/lobby/new", LobbyController.newLobby);
-app.post("/api/lobby/join", LobbyController.joinLobby);
-app.post("/api/lobby/kick", LobbyController.kickOpponent);
-app.post("/api/lobby/ready", LobbyController.setReady);
+app.post("/api/lobby/new", lobby.newLobby);
+app.post("/api/lobby/join", lobby.joinLobby);
+app.post("/api/lobby/kick", lobby.kickOpponent);
+app.post("/api/lobby/ready", lobby.setReady);
 
 // --------------------
 // GAME ROUTES
 // --------------------
-app.post("/api/game/start", GameController.startGame);
+app.post("/api/game/start", game.startGame);
 
-app.post("/api/game/draw", GameController.drawCard);
-app.post("/api/game/place", GameController.placeCard);
-app.post("/api/game/sacrifice", GameController.sacrificeCard);
-app.post("/api/game/end-place", GameController.endPlacePhase);
+app.post("/api/game/draw", game.drawCard);
+app.post("/api/game/place", game.placeCard);
+app.post("/api/game/sacrifice", game.sacrificeCard);
+app.post("/api/game/end-place", game.endPlacePhase);
 
-app.get("/api/game/board", GameController.getGameboard);
-app.get("/api/game/hand", GameController.getHand);
+app.get("/api/game/board", game.getGameboard);
+app.get("/api/game/hand", game.getHand);
 
 
 // 404
