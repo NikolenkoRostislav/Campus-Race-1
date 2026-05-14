@@ -1,7 +1,7 @@
 class PlayerInfo {
     constructor(id) {
         this.id = id;
-        this.deck = [];
+        this.deck = []; //Just realized this should probably be called hand, my bad
         this.drawStarterDeck();
         this.hp = 10;
         this.energy = 0;
@@ -48,10 +48,6 @@ class PlayerInfo {
         for (let i = 0; i <= 6; i++) {
             this.drawCard(true)
         }
-    }
-
-    getDeck() {
-        return this.deck
     }
 
     getDamage(dmg) {

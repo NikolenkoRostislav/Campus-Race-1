@@ -15,6 +15,16 @@ class Game {
         this.turn = 0;
     }
 
+    getPlayerSideByUserID(userID) {
+        for (const playerSide of this.players) {
+            if (playerSide.values().userID === userID) {
+                return playerSide;
+            }
+        }
+
+        return null;
+    }
+
     getPlayer(side) {
         return this.players.get(side);
     }
@@ -30,8 +40,8 @@ class Game {
     }
 
     wipeEnergy() {
-        this.player1Info.clearEnergy();
-        this.player2Info.clearEnergy();
+        this.getPlayer(1).clearEnergy();
+        this.getPlayer(-1).clearEnergy();
     }
 
     sacrificeCard(x, side) {
@@ -42,8 +52,6 @@ class Game {
             this.getPlayer(side).addEnergy(3);
         }
         this.getPlayer(side).addEnergy(1);
-
-        return sacrificeLog
     }
 
     placeCard(x, side, cardID) {
@@ -56,7 +64,9 @@ class Game {
         ) {
             player.consumeCard(cardID);
             player.consumeEnergy(card.cost);
+            return true;
         }
+        return false;
     }
 
     playerDie(side) {
