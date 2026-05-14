@@ -25,21 +25,21 @@ class GameController {
                 });
             }
 
-            const isCreatorFirst = Math.random() < 0.5;
-
+            let isCreatorFirst = Math.random() < 0.5;
+            isCreatorFirst = true; //remove later
             const p1ID = isCreatorFirst ? lobby.creatorID : lobby.opponentID;
             const p2ID = isCreatorFirst ? lobby.opponentID : lobby.creatorID;
 
             LobbyController.lobbies.delete(roomID);
 
-            const game = new GameLoop(roomID, p1ID, p2ID);
+            const gameLoop = new GameLoop(roomID, p1ID, p2ID);
 
-            game.on("state_changed", (data) => {
+            gameLoop.on("state_changed", (data) => {
                 console.log("Game update:", data);
             });
 
             GameController.games.set(roomID, {
-                game,
+                gameLoop,
                 players: {
                     [p1ID]: 1,
                     [p2ID]: -1
@@ -87,7 +87,7 @@ class GameController {
                 return res.status(403).json({ success: false, message: "Invalid player" });
             }
 
-            const result = room.game.drawCard(side, random);
+            const result = room.gameLoop.drawCard(side, random);
 
             return res.json({ success: result });
 
@@ -112,9 +112,9 @@ class GameController {
                 return res.status(403).json({ success: false });
             }
 
-            const result = room.game.placeCard(side, x, cardID);
+            const result = room.gameLoop.placeCard(side, x, cardID);
 
-            return res.json({ success: result });
+            return res.json(result);
 
         } catch (err) {
             console.error(err);
@@ -133,7 +133,7 @@ class GameController {
             const side = GameController.getSide(roomID, userID);
             if (!side) return res.status(403).json({ success: false });
 
-            const result = room.game.sacrificeCard(side, x);
+            const result = room.gameLoop.sacrificeCard(side, x);
 
             return res.json({ success: result });
 
@@ -154,7 +154,7 @@ class GameController {
             const side = GameController.getSide(roomID, userID);
             if (!side) return res.status(403).json({ success: false });
 
-            const result = room.game.endPlacePhase(side);
+            const result = room.gameLoop.endPlacePhase(side);
 
             return res.json({ success: result });
 
@@ -173,7 +173,7 @@ class GameController {
         }
 
         return res.json({
-            board: room.game.gameBoard
+            board: Object.fromEntries(room.gameLoop.game.gameBoard.board)
         });
     }
 
@@ -188,7 +188,7 @@ class GameController {
         if (!side) return res.status(403).json({ success: false });
 
         return res.json({
-            hand: room.game.getPlayer(side).deck
+            hand: room.gameLoop.game.getPlayer(side).hand
         });
     }
 }

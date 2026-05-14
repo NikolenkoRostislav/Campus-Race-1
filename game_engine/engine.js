@@ -1,8 +1,8 @@
-const CardCatalog = require("./internal/CardCatalog.js");
-const { AttackCommand, AttackCommandRegistry } = require("./internal/AttackCommand.js");
-const { CardType } = require("./internal/Card.js");
-const GameBoard = require("./internal/GameBoard.js");
-const PlayerInfo = require("./internal/PlayerInfo.js");
+const CardCatalog = require("./internal/cardCatalog.js");
+const { AttackCommand, AttackCommandRegistry } = require("./internal/attackCommand.js");
+const { CardType } = require("./internal/card.js");
+const GameBoard = require("./internal/gameBoard.js");
+const PlayerInfo = require("./internal/playerInfo.js");
 
 class Game {
     constructor(p1Id, p2Id) {
@@ -45,6 +45,7 @@ class Game {
     }
 
     sacrificeCard(x, side) {
+        let cardData = this.gameBoard.get(x, side);
         let card = CardCatalog.get(cardData.cardID);
         this.gameBoard.removeCard(x, side);
 
@@ -55,11 +56,18 @@ class Game {
     }
 
     placeCard(x, side, cardID) {
+        cardID = Number(cardID);
         let card = CardCatalog.get(cardID);
         let player = this.getPlayer(side);
+        console.log(player.hand);
+        console.log("cardID", cardID);
+        console.log("card", card);
+        console.log("has card", player.hasCard(cardID));
+        console.log("has energy", player.hasEnoughEnergy(card.cost));
+
         if (
             player.hasCard(cardID) &&
-            player.hasEnergy(card.cost) &&
+            player.hasEnoughEnergy(card.cost) &&
             this.gameBoard.placeCard(x, side, cardID)
         ) {
             player.consumeCard(cardID);

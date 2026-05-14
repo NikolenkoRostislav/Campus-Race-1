@@ -138,11 +138,12 @@ class GameLoop extends EventEmitter {
     }
 
     placeCard(side, x, cardID) {
+        console.log(side, x, cardID, this.state);
         const valid = (side === 1 && this.state === States.P1_PLACE) || (side === -1 && this.state === States.P2_PLACE);
-        if (!valid) return false;
+        if (!valid) return "can't place card, invalid permissions";
 
         const success = this.game.placeCard(x, side, cardID);
-        if (!success) return false;
+        if (!success) return "can't place card, idk why";
 
         return {
             board: this.game.gameBoard,
