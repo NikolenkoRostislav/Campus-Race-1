@@ -1,4 +1,4 @@
-const CardType = require("./Card.js").CardType;
+const { CardType } = require("./card.js");
 
 class AttackCommand {
     constructor(game, x, attackingSide, battleLog) {

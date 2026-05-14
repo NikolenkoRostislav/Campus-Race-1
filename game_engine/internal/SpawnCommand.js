@@ -1,4 +1,4 @@
-const { CardType } = require("./Card.js");
+const { CardType } = require("./card.js");
 
 class SpawnCommand {
     constructor(gameBoard, x, side, card) {

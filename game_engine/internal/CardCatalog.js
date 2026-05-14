@@ -1,5 +1,4 @@
-const CardType = require("./Card.js").CardType;
-const Card = require("./Card.js").Card;
+const { CardType, Card } = require("./card.js");
 
 const cardCatalog = new Map([
   [1, new Card(0, 1, 0)],                               // Can be picked instead of drawing a random card

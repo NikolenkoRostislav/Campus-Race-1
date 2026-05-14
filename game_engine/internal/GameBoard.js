@@ -1,6 +1,6 @@
-const CardCatalog = require("./CardCatalog.js");
-const CardData = require("./CardData.js");
-const { SpawnCommand, SpawnCommandRegistry } = require("./SpawnCommand.js");
+const CardCatalog = require("./cardCatalog.js");
+const CardData = require("./cardData.js");
+const { SpawnCommand, SpawnCommandRegistry } = require("./spawnCommand.js");
 
 class GameBoard {
     constructor() {

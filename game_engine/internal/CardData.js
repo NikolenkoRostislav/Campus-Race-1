@@ -1,4 +1,4 @@
-const cardCatalog = require("./CardCatalog.js");
+const cardCatalog = require("./cardCatalog.js");
 
 class CardData {
     constructor(cardID) {
