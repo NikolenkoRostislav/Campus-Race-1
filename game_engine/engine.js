@@ -1,8 +1,8 @@
-const CardCatalog = require("./classes/CardCatalog.js");
-const { AttackCommand, AttackCommandRegistry } = require("./classes/AttackCommand.js");
-const { CardType } = require("./classes/Card.js");
-const GameBoard = require("./classes/GameBoard.js");
-const PlayerInfo = require("./classes/PlayerInfo.js");
+const CardCatalog = require("./internal/CardCatalog.js");
+const { AttackCommand, AttackCommandRegistry } = require("./internal/AttackCommand.js");
+const { CardType } = require("./internal/Card.js");
+const GameBoard = require("./internal/GameBoard.js");
+const PlayerInfo = require("./internal/PlayerInfo.js");
 
 class Game {
     constructor(p1Id, p2Id) {

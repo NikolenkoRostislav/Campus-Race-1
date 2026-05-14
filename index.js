@@ -3,8 +3,8 @@ const session = require("express-session");
 const path = require("path");
 const auth = require("./controllers/authController.js");
 const register = require("./controllers/registrationController.js");
-
-const { NewGame, GetGame } = require("./game_engine/game.js");
+const lobby = require("./controllers/lobbyController.js");
+const game = require("./controllers/gameController.js");
 
 require('dotenv').config();
 
@@ -48,10 +48,15 @@ app.post("/api/logout", auth.logout);
 app.post("/api/game/new", (req, res) => {
     const roomID = NewGame();
 
-    res.json({
-        success: true,
-        roomID
-    });
+    res.json({ roomID: roomID });
+});
+
+app.post("/api/game/join", (req, res) => {
+    const roomID = req.query.roomID;
+    const game = GetGame(roomID) || null;
+    if (!game) return res.status(404).send("Not found");
+
+    res.json({ success: true });
 });
 
 app.get("/api/game", (req, res) => {

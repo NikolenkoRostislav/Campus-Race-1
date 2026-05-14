@@ -1,8 +1,8 @@
 class PlayerInfo {
     constructor(id) {
         this.id = id;
-        this.deck = []; //Just realized this should probably be called hand, my bad
-        this.drawStarterDeck();
+        this.hand = [];
+        this.drawStarterHand();
         this.hp = 10;
         this.energy = 0;
     }
@@ -27,12 +27,12 @@ class PlayerInfo {
     }
 
     hasCard(cardID) {
-        return this.deck.includes(cardID);
+        return this.hand.includes(cardID);
     }
 
     consumeCard(cardID) {
         if (!this.hasCard(cardID)) return false
-        this.deck.splice(this.deck.indexOf(cardID), 1);
+        this.hand.splice(this.hand.indexOf(cardID), 1);
         return true
     }
 
@@ -40,10 +40,10 @@ class PlayerInfo {
         let cardID = 1
         if (random) cardID = Math.floor(Math.random() * 20) + 2;
 
-        this.deck.push(cardID);
+        this.hand.push(cardID);
     }
 
-    drawStarterDeck() {
+    drawStarterHand() {
         this.drawCard(false)
         for (let i = 0; i <= 6; i++) {
             this.drawCard(true)

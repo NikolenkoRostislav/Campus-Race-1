@@ -133,7 +133,7 @@ class GameLoop extends EventEmitter {
         }
 
         return {
-            deck: this.game.getPlayer(side).deck
+            hand: this.game.getPlayer(side).hand
         };
     }
 
@@ -146,7 +146,7 @@ class GameLoop extends EventEmitter {
 
         return {
             board: this.game.gameBoard,
-            deck: this.game.getPlayer(side).deck,
+            hand: this.game.getPlayer(side).hand,
             energy: this.game.getPlayer(side).energy
         };
     }
