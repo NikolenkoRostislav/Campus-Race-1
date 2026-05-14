@@ -59,11 +59,6 @@ class Game {
         cardID = Number(cardID);
         let card = CardCatalog.get(cardID);
         let player = this.getPlayer(side);
-        console.log(player.hand);
-        console.log("cardID", cardID);
-        console.log("card", card);
-        console.log("has card", player.hasCard(cardID));
-        console.log("has energy", player.hasEnoughEnergy(card.cost));
 
         if (
             player.hasCard(cardID) &&

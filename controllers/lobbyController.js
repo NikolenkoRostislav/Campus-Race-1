@@ -8,27 +8,18 @@ class LobbyController {
             const userID = req.session.user?.id;
 
             if (!userID) {
-                return res.status(401).json({
-                    success: false,
-                    message: "Not authenticated"
-                });
+                return res.status(401).json({ message: "Not authenticated" });
             }
 
             const lobby = new Lobby(userID);
 
             LobbyController.lobbies.set(lobby.roomID, lobby);
 
-            return res.status(200).json({
-                success: true,
-                roomID: lobby.roomID
-            });
+            return res.status(200).json({ roomID: lobby.roomID });
 
         } catch (err) {
             console.error(err);
-            return res.status(500).json({
-                success: false,
-                message: "Server error"
-            });
+            return res.status(500).json({ message: "something went wrong" });
         }
     }
 
@@ -38,32 +29,22 @@ class LobbyController {
             const userID = req.session.user?.id;
 
             if (!roomID || !userID) {
-                return res.status(422).json({
-                    success: false,
-                    message: "Missing roomID or user"
-                });
+                return res.status(422).json({ message: "Missing roomID or user" });
             }
 
             const lobby = LobbyController.lobbies.get(roomID);
 
             if (!lobby) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Lobby not found"
-                });
+                return res.status(404).json({ message: "Lobby not found" });
             }
 
             const ok = lobby.addOpponent(userID);
 
-            return res.json({
-                success: ok
-            });
+            return res.json({ success: ok });
 
         } catch (err) {
             console.error(err);
-            return res.status(500).json({
-                success: false
-            });
+            return res.status(500).json({ message: "something went wrong" });
         }
     }
 
@@ -73,26 +54,17 @@ class LobbyController {
             const userID = req.session.user?.id;
 
             if (!roomID || !userID) {
-                return res.status(422).json({
-                    success: false,
-                    message: "Missing roomID or user"
-                });
+                return res.status(422).json({ message: "Missing roomID or user" });
             }
 
             const lobby = LobbyController.lobbies.get(roomID);
 
             if (!lobby) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Lobby not found"
-                });
+                return res.status(404).json({ message: "Lobby not found" });
             }
 
             if (lobby.creatorID !== userID) {
-                return res.status(403).json({
-                    success: false,
-                    message: "Only creator can kick"
-                });
+                return res.status(403).json({ message: "Only creator can kick" });
             }
 
             lobby.opponentID = null;
@@ -103,9 +75,7 @@ class LobbyController {
 
         } catch (err) {
             console.error(err);
-            return res.status(500).json({
-                success: false
-            });
+            return res.status(500).json({ message: "something went wrong" });
         }
     }
 
@@ -115,19 +85,13 @@ class LobbyController {
             const userID = req.session.user?.id;
 
             if (!roomID || !userID) {
-                return res.status(422).json({
-                    success: false,
-                    message: "Missing roomID or user"
-                });
+                return res.status(422).json({ message: "Missing roomID or user" });
             }
 
             const lobby = LobbyController.lobbies.get(roomID);
 
             if (!lobby) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Lobby not found"
-                });
+                return res.status(404).json({ message: "Lobby not found" });
             }
 
             lobby.setReady(userID);
@@ -138,9 +102,7 @@ class LobbyController {
 
         } catch (err) {
             console.error(err);
-            return res.status(500).json({
-                success: false
-            });
+            return res.status(500).json({ message: "something went wrong" });
         }
     }
 }

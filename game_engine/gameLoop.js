@@ -11,8 +11,8 @@ const States = {
     P2_BATTLE: "P2_BATTLE"
 };
 
-const DrawTime = 15000;
-const PlaceTime = 60000;
+const DrawTime = 15_000;
+const PlaceTime = 60_000;
 
 class GameLoop extends EventEmitter {
     constructor(id, p1ID, p2ID) {
@@ -138,15 +138,14 @@ class GameLoop extends EventEmitter {
     }
 
     placeCard(side, x, cardID) {
-        console.log(side, x, cardID, this.state);
         const valid = (side === 1 && this.state === States.P1_PLACE) || (side === -1 && this.state === States.P2_PLACE);
-        if (!valid) return "can't place card, invalid permissions";
+        if (!valid) return "failed to place card";
 
         const success = this.game.placeCard(x, side, cardID);
-        if (!success) return "can't place card, idk why";
+        if (!success) return "failed to place card";
 
         return {
-            board: this.game.gameBoard,
+            board: Object.fromEntries(this.game.gameBoard.board),
             hand: this.game.getPlayer(side).hand,
             energy: this.game.getPlayer(side).energy
         };
@@ -158,7 +157,7 @@ class GameLoop extends EventEmitter {
 
         this.game.sacrificeCard(x, side);
         return {
-            board: this.game.gameBoard,
+            board: Object.fromEntries(this.game.gameBoard.board),
             energy: this.game.getPlayer(side).energy
         };
     }

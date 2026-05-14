@@ -25,8 +25,7 @@ class GameController {
                 });
             }
 
-            let isCreatorFirst = Math.random() < 0.5;
-            isCreatorFirst = true; //remove later
+            const isCreatorFirst = Math.random() < 0.5;
             const p1ID = isCreatorFirst ? lobby.creatorID : lobby.opponentID;
             const p2ID = isCreatorFirst ? lobby.opponentID : lobby.creatorID;
 
@@ -93,7 +92,7 @@ class GameController {
 
         } catch (err) {
             console.error(err);
-            return res.status(500).json({ success: false });
+            return res.status(500).json({ message: "something went wrong" });
         }
     }
 
@@ -118,7 +117,7 @@ class GameController {
 
         } catch (err) {
             console.error(err);
-            return res.status(500).json({ success: false });
+            return res.status(500).json({ message: "something went wrong" });
         }
     }
 
@@ -139,7 +138,7 @@ class GameController {
 
         } catch (err) {
             console.error(err);
-            return res.status(500).json({ success: false });
+            return res.status(500).json({ message: "something went wrong" });
         }
     }
 
@@ -160,36 +159,46 @@ class GameController {
 
         } catch (err) {
             console.error(err);
-            return res.status(500).json({ success: false });
+            return res.status(500).json({ message: "something went wrong" });
         }
     }
 
     static getGameboard(req, res) {
-        const { roomID } = req.query;
+        try {
+            const { roomID } = req.query;
 
-        const room = GameController.getRoomOrFail(roomID);
-        if (!room) {
-            return res.status(404).json({ success: false });
+            const room = GameController.getRoomOrFail(roomID);
+            if (!room) {
+                return res.status(404).json({ success: false });
+            }
+
+            return res.json({
+                board: Object.fromEntries(room.gameLoop.game.gameBoard.board)
+            });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "something went wrong" });
         }
-
-        return res.json({
-            board: Object.fromEntries(room.gameLoop.game.gameBoard.board)
-        });
     }
 
     static getHand(req, res) {
-        const { roomID } = req.query;
-        const userID = req.session.user?.id;
+        try {
+            const { roomID } = req.query;
+            const userID = req.session.user?.id;
 
-        const room = GameController.getRoomOrFail(roomID);
-        if (!room) return res.status(404).json({ success: false });
+            const room = GameController.getRoomOrFail(roomID);
+            if (!room) return res.status(404).json({ success: false });
 
-        const side = GameController.getSide(roomID, userID);
-        if (!side) return res.status(403).json({ success: false });
+            const side = GameController.getSide(roomID, userID);
+            if (!side) return res.status(403).json({ success: false });
 
-        return res.json({
-            hand: room.gameLoop.game.getPlayer(side).hand
-        });
+            return res.json({
+                hand: room.gameLoop.game.getPlayer(side).hand
+            });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "something went wrong" });
+        }
     }
 }
 
