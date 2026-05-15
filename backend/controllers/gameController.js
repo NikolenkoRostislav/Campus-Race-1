@@ -37,7 +37,7 @@ class GameController {
             }
 
             const isCreatorFirst = Math.random() < 0.5;
-            //const isCreatorFirst = true;
+            // const isCreatorFirst = true;
             const p1ID = isCreatorFirst ? lobby.creatorID : lobby.opponentID;
             const p2ID = isCreatorFirst ? lobby.opponentID : lobby.creatorID;
 
@@ -48,6 +48,10 @@ class GameController {
             gameLoop.on("state_changed", (data) => {
                 GameController.sendToRoom(roomID, "game_update", data);
             });
+            gameLoop.on("battle_completed", (data) => {
+                GameController.sendToRoom(roomID, "battle_completed", data);
+            });
+
 
             GameController.rooms.set(roomID, gameLoop);
 

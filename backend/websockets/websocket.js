@@ -15,7 +15,6 @@ function initWebSocket(server, sessionMiddleware) {
         if (!socket.request.session?.user) return socket.disconnect();
         const userId = socket.request.session.user.id;
         if (!userId) return socket.disconnect();
-        console.log("user connected ", userId);
         socket.join(userId);
     });
 }
