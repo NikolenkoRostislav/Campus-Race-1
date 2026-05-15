@@ -24,7 +24,7 @@ class GameLoop extends EventEmitter {
         this.state = null;
         this.timer = null;
 
-        this.enterState(States.P1_DRAW);
+        this.enterState(States.P1_PLACE);
     }
 
     clearTimer() {

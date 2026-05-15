@@ -1,7 +1,7 @@
 const Lobby = require("../game_engine/lobby.js");
 
 class LobbyController {
-    static lobbies = new Map();
+    static lobbies = new Map(); //key: roomID, val: Lobby
 
     static newLobby(req, res) {
         try {
