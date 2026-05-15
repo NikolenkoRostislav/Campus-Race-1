@@ -1,8 +1,19 @@
 const GameLoop = require("../game_engine/gameLoop.js");
 const LobbyController = require("./lobbyController.js");
+const { getIO } = require("../websockets/websocket.js");
 
 class GameController {
     static rooms = new Map(); // key: roomID, val: gameLoop
+
+    static sendToRoom(roomID, event, data) {
+        const room = GameController.rooms.get(roomID);
+        if (!room) return null;
+
+        const uids = GameController.getUserIDsInRoom(roomID);
+
+        getIO().to(uids[0]).emit(event, data);
+        getIO().to(uids[1]).emit(event, data);
+    }
 
     static startGame(req, res) {
         try {
@@ -35,7 +46,7 @@ class GameController {
             const gameLoop = new GameLoop(roomID, p1ID, p2ID);
 
             gameLoop.on("state_changed", (data) => {
-                console.log("Game update:", data);
+                GameController.sendToRoom(roomID, "game_update", data);
             });
 
             GameController.rooms.set(roomID, gameLoop);
@@ -54,6 +65,12 @@ class GameController {
                 message: "Server error"
             });
         }
+    }
+
+    static getUserIDsInRoom(roomID) {
+        const room = GameController.rooms.get(roomID);
+        if (!room) return null;
+        return [room.game.players.get(1).id, room.game.players.get(-1).id];
     }
 
     static getSide(roomID, userID) {

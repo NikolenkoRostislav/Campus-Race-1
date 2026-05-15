@@ -1,7 +1,10 @@
+const path = require("path");
+const http = require("http");
+
 const express = require("express");
 const session = require("express-session");
-const path = require("path");
 
+const { initWebSocket } = require("./websockets/websocket.js");
 const auth = require("./controllers/authController.js");
 const register = require("./controllers/registrationController.js");
 const lobby = require("./controllers/lobbyController.js");
@@ -14,21 +17,24 @@ const port = process.env.PORT;
 const secretKey = process.env.SECRET_KEY;
 
 const app = express();
+const server = http.createServer(app);
+
+const sessionMiddleware = session({
+    secret: secretKey,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60
+    }
+});
+
+initWebSocket(server, sessionMiddleware);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(
-    session({
-        secret: secretKey,
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60
-        }
-    })
-);
+app.use(sessionMiddleware);
 
 // --------------------
 // PAGES
@@ -82,6 +88,6 @@ app.use((req, res) => {
     );
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server running on http://${host}:${port}`);
 });

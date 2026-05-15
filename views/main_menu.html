@@ -16,10 +16,15 @@
         <button id="logoutBtn">Logout</button>
     </div>
 </body>
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
     const userIDText = document.getElementById("userID");
     const logoutBtn = document.getElementById("logoutBtn");
+
+    let socket = io({
+        autoConnect: false
+    });
+    let socketConnected = false;
 
     async function checkAuth() {
         const res = await fetch("/api/me");
@@ -30,6 +35,8 @@
             return;
         }
         userIDText.textContent = `User ID: ${data.user.id}`;
+
+        connectSocket();
     }
 
     checkAuth();
@@ -41,6 +48,21 @@
 
         await checkAuth();
     });
+
+    function connectSocket() {
+        if (socketConnected) return;
+
+        socket.connect();
+        socketConnected = true;
+
+        socket.on("connect", () => {
+            console.log("connected:", socket.id);
+        });
+
+        socket.on("game_update", (data) => {
+            console.log("got data from server:", data);
+        });
+    }
 </script>
 
 </html>
