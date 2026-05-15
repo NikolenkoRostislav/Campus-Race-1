@@ -11,6 +11,7 @@ const States = {
     P2_BATTLE: "P2_BATTLE"
 };
 
+const BattleTime = 5_000;
 const DrawTime = 15_000;
 const PlaceTime = 60_000;
 
@@ -91,7 +92,7 @@ class GameLoop extends EventEmitter {
         this.timer = setTimeout(() => {
             this.game.turn++;
             this.enterState(States.P2_DRAW);
-        }, 1000);
+        }, BattleTime);
     }
 
     handleP2Draw() {
@@ -115,7 +116,7 @@ class GameLoop extends EventEmitter {
         this.timer = setTimeout(() => {
             this.game.turn++;
             this.enterState(States.P1_DRAW);
-        }, 1000);
+        }, BattleTime);
     }
 
     drawCard(side, random) {

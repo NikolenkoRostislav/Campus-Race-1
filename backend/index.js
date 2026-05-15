@@ -15,6 +15,7 @@ require("dotenv").config();
 const host = process.env.HOST;
 const port = process.env.PORT;
 const secretKey = process.env.SECRET_KEY;
+const frontendPath = (...p) => path.join(__dirname, "../frontend", ...p);
 
 const app = express();
 const server = http.createServer(app);
@@ -32,23 +33,24 @@ const sessionMiddleware = session({
 initWebSocket(server, sessionMiddleware);
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(frontendPath("public")));
 
 app.use(sessionMiddleware);
+
 
 // --------------------
 // PAGES
 // --------------------
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "main_menu.html"));
+    res.sendFile(frontendPath("views", "main_menu.html"));
 });
 
 app.get("/register", (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "register.html"));
+    res.sendFile(frontendPath("views", "register.html"));
 });
 
 app.get("/login", (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "login.html"));
+    res.sendFile(frontendPath("views", "login.html"));
 });
 
 // --------------------
@@ -83,9 +85,7 @@ app.get("/api/game/hand", game.getHand);
 
 // 404
 app.use((req, res) => {
-    res.status(404).sendFile(
-        path.join(__dirname, "views", "404.html")
-    );
+    res.status(404).sendFile(frontendPath("views", "404.html"));
 });
 
 server.listen(port, () => {
