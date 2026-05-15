@@ -34,6 +34,10 @@ app.get("/login", (req, res) => {
     res.sendFile(path.join(__dirname, "views", "login.html"));
 });
 
+app.get("/game", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "game.html"));
+});
+
 app.post("/api/register", register.register);
 
 app.post("/api/login", auth.login);

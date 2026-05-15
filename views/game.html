@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <link rel="stylesheet" href="/gameboard.css">
+</head>
+
+<body>
+
+    <main id="game-table">
+        <!-- Player's profile (avatar, HP) -->
+        <div class="profile-container left-side">
+            <div class="avatar player-avatar"></div>
+            <div id="left-hp" class="hp-container"></div>
+        </div>
+
+        <div class="profile-container right-side">
+            <div id="right-hp" class="hp-container"></div>
+            <div class="avatar opponent-avatar"></div>
+        </div>
+
+        <!-- Opponent's front row -->
+        <div class="card-row" id="opponent-front-row">
+            <div class="card-slot" data-index="0"></div>
+            <div class="card-slot" data-index="1"></div>
+            <div class="card-slot" data-index="2"></div>
+            <div class="card-slot" data-index="3"></div>
+        </div>
+
+        <!-- Player's row (bottom) -->
+        <div class="card-row" id="player-front-row">
+            <div class="card-slot" data-index="0"></div>
+            <div class="card-slot" data-index="1"></div>
+            <div class="card-slot" data-index="2"></div>
+            <div class="card-slot" data-index="3"></div>
+        </div>
+
+        <!-- Energy counter -->
+        <div id="energy-counter">
+            <span id="energy-amount" class="energy-zero">0</span>
+            <div class="energy-icon"></div>
+        </div>
+
+        <div id="player-hand" class="hand-container"></div>
+
+    </main>
+
+    <script src="/game.js"></script>
+    <script src="/test.js"></script>
+
+</body>
+
+</html>
