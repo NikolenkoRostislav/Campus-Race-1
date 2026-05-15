@@ -59,7 +59,7 @@
             console.log("connected:", socket.id);
         });
 
-        socket.on("game_update", (data) => {
+        socket.on("state_changed", (data) => {
             console.log("got data from server:", data);
         });
 

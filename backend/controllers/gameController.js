@@ -46,12 +46,11 @@ class GameController {
             const gameLoop = new GameLoop(roomID, p1ID, p2ID);
 
             gameLoop.on("state_changed", (data) => {
-                GameController.sendToRoom(roomID, "game_update", data);
+                GameController.sendToRoom(roomID, "state_changed", data);
             });
             gameLoop.on("battle_completed", (data) => {
                 GameController.sendToRoom(roomID, "battle_completed", data);
             });
-
 
             GameController.rooms.set(roomID, gameLoop);
 
@@ -99,18 +98,21 @@ class GameController {
 
             const room = GameController.getRoomOrFail(roomID);
             if (!room) {
-                return res.status(404).json({ success: false, message: "Game not found" });
+                return res.status(404).json({ message: "Game not found" });
             }
 
             const side = GameController.getSide(roomID, userID);
             if (!side) {
-                return res.status(403).json({ success: false, message: "Invalid player" });
+                return res.status(403).json({ message: "Invalid player" });
             }
 
             const result = room.drawCard(side, random);
 
-            return res.json({ success: result });
-
+            if (!result) {
+                return res.status(403).json({ message: "Can't do this" });
+            }
+            GameController.sendToRoom(roomID, "card_taken", { userID, hand: result.hand });
+            return res.json(result);
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message: "something went wrong" });
@@ -124,16 +126,19 @@ class GameController {
 
             const room = GameController.getRoomOrFail(roomID);
             if (!room) {
-                return res.status(404).json({ success: false });
+                return res.status(404).json({ message: "Game not found" });
             }
 
             const side = GameController.getSide(roomID, userID);
             if (!side) {
-                return res.status(403).json({ success: false });
+                return res.status(403).json({ message: "Invalid player" });
             }
 
             const result = room.placeCard(side, x, cardID);
-
+            if (!result) {
+                return res.status(403).json({ message: "Can't do this" });
+            }
+            GameController.sendToRoom(roomID, "card_placed", result);
             return res.json(result);
 
         } catch (err) {
@@ -148,14 +153,16 @@ class GameController {
             const userID = req.session.user?.id;
 
             const room = GameController.getRoomOrFail(roomID);
-            if (!room) return res.status(404).json({ success: false });
+            if (!room) return res.status(404).json({ message: "Game not found" });
 
             const side = GameController.getSide(roomID, userID);
-            if (!side) return res.status(403).json({ success: false });
+            if (!side) return res.status(403).json({ message: "Invalid player" });
 
             const result = room.sacrificeCard(side, x);
+            if (!result) return res.status(403).json({ message: "Can't do this" });
+            GameController.sendToRoom(roomID, "card_sacrificed", result);
 
-            return res.json({ success: result });
+            return res.json(result);
 
         } catch (err) {
             console.error(err);

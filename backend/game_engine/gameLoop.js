@@ -142,10 +142,10 @@ class GameLoop extends EventEmitter {
 
     placeCard(side, x, cardID) {
         const valid = (side === 1 && this.state === States.P1_PLACE) || (side === -1 && this.state === States.P2_PLACE);
-        if (!valid) return "failed to place card";
+        if (!valid) return false;
 
         const success = this.game.placeCard(x, side, cardID);
-        if (!success) return "failed to place card";
+        if (!success) return false;
 
         return {
             board: Object.fromEntries(this.game.gameBoard.board),
