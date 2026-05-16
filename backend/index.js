@@ -67,6 +67,7 @@ app.post("/api/logout", auth.logout);
 app.post("/api/lobby/new", lobby.newLobby);
 app.post("/api/lobby/join", lobby.joinLobby);
 app.post("/api/lobby/kick", lobby.kickOpponent);
+app.delete("/api/lobby/leave", lobby.leaveLobby);
 app.post("/api/lobby/ready", lobby.setReady);
 
 // --------------------
@@ -78,6 +79,7 @@ app.post("/api/game/draw", game.drawCard);
 app.post("/api/game/place", game.placeCard);
 app.post("/api/game/sacrifice", game.sacrificeCard);
 app.post("/api/game/end-place", game.endPlacePhase);
+app.delete("/api/game/end", game.endGame);
 
 app.get("/api/game/board", game.getGameboard);
 app.get("/api/game/hand", game.getHand);

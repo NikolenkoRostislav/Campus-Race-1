@@ -3,6 +3,36 @@ const Lobby = require("../game_engine/lobby.js");
 class LobbyController {
     static lobbies = new Map(); //key: roomID, val: Lobby
 
+    static leaveLobby(req, res) {
+        try {
+            const { roomID } = req.body;
+            const userID = req.session.user?.id;
+            if (!roomID) {
+                return res.status(422).json({ message: "Missing roomID" });
+            }
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
+            const lobby = LobbyController.lobbies.get(roomID);
+            if (!lobby) {
+                return res.status(404).json({ message: "Lobby not found" });
+            }
+            if (lobby.opponentID == userID) {
+                lobby.opponentID = null;
+                return res.status(204);
+            }
+            if (lobby.creatorID !== userID) {
+                return res.status(403).json({ message: "Only creator can delete lobby" });
+            }
+            LobbyController.lobbies.delete(roomID);
+
+            return res.status(204);
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "something went wrong" });
+        }
+    }
+
     static newLobby(req, res) {
         try {
             const userID = req.session.user?.id;
@@ -16,7 +46,6 @@ class LobbyController {
             LobbyController.lobbies.set(lobby.roomID, lobby);
 
             return res.status(200).json({ roomID: lobby.roomID });
-
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message: "something went wrong" });
@@ -28,10 +57,12 @@ class LobbyController {
             const { roomID } = req.body;
             const userID = req.session.user?.id;
 
-            if (!roomID || !userID) {
-                return res.status(422).json({ message: "Missing roomID or user" });
+            if (!roomID) {
+                return res.status(422).json({ message: "Missing roomID" });
             }
-
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
             const lobby = LobbyController.lobbies.get(roomID);
 
             if (!lobby) {
@@ -53,10 +84,12 @@ class LobbyController {
             const { roomID } = req.body;
             const userID = req.session.user?.id;
 
-            if (!roomID || !userID) {
-                return res.status(422).json({ message: "Missing roomID or user" });
+            if (!roomID) {
+                return res.status(422).json({ message: "Missing roomID" });
             }
-
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
             const lobby = LobbyController.lobbies.get(roomID);
 
             if (!lobby) {
@@ -69,9 +102,7 @@ class LobbyController {
 
             lobby.opponentID = null;
 
-            return res.json({
-                success: true
-            });
+            return res.status(204);
 
         } catch (err) {
             console.error(err);
@@ -84,10 +115,12 @@ class LobbyController {
             const { roomID } = req.body;
             const userID = req.session.user?.id;
 
-            if (!roomID || !userID) {
-                return res.status(422).json({ message: "Missing roomID or user" });
+            if (!roomID) {
+                return res.status(422).json({ message: "Missing roomID" });
             }
-
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
             const lobby = LobbyController.lobbies.get(roomID);
 
             if (!lobby) {

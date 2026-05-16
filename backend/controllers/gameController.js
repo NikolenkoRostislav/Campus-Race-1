@@ -15,16 +15,42 @@ class GameController {
         getIO().to(uids[1]).emit(event, data);
     }
 
+    static endGame(req, res) {
+        try {
+            const { roomID } = req.body;
+            const userID = req.session.user?.id;
+            if (!roomID) {
+                return res.status(422).json({ message: "Missing roomID" });
+            }
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
+            if (GameController.getSide(roomID, userID) === null) {
+                return res.status(403).json({ message: "Only a player can end the game" });
+            }
+            const room = LobbyController.lobbies.get(roomID);
+            if (!room) {
+                return res.status(404).json({ message: "Lobby not found" });
+            }
+            GameController.rooms.delete(roomID);
+
+            return res.status(204);
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "something went wrong" });
+        }
+    }
+
     static startGame(req, res) {
         try {
             const { roomID } = req.body;
             const userID = req.session.user?.id;
 
-            if (!roomID || !userID) {
-                return res.status(422).json({
-                    success: false,
-                    message: "Missing roomID or user session"
-                });
+            if (!roomID) {
+                return res.status(422).json({ message: "Missing roomID" });
+            }
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
             }
 
             const lobby = LobbyController.lobbies.get(roomID);
@@ -123,6 +149,9 @@ class GameController {
         try {
             const { roomID, x, cardID } = req.body;
             const userID = req.session.user?.id;
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
 
             const room = GameController.getRoomOrFail(roomID);
             if (!room) {
@@ -151,6 +180,9 @@ class GameController {
         try {
             const { roomID, x } = req.body;
             const userID = req.session.user?.id;
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
 
             const room = GameController.getRoomOrFail(roomID);
             if (!room) return res.status(404).json({ message: "Game not found" });
@@ -174,6 +206,9 @@ class GameController {
         try {
             const { roomID } = req.body;
             const userID = req.session.user?.id;
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
 
             const room = GameController.getRoomOrFail(roomID);
             if (!room) return res.status(404).json({ success: false });
@@ -213,6 +248,9 @@ class GameController {
         try {
             const { roomID } = req.query;
             const userID = req.session.user?.id;
+            if (!userID) {
+                return res.status(401).json({ message: "Not authenticated" });
+            }
 
             const room = GameController.getRoomOrFail(roomID);
             if (!room) return res.status(404).json({ success: false });
