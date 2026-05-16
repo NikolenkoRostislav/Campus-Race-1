@@ -2,8 +2,8 @@ const path = require("path");
 const http = require("http");
 
 const express = require("express");
-const session = require("express-session");
 
+const { sessionMiddleware, authMiddleware, lobbyMiddleware, gameMiddleware } = require("./middleware/middleware.js");
 const { initWebSocket } = require("./websockets/websocket.js");
 const auth = require("./controllers/authController.js");
 const register = require("./controllers/registrationController.js");
@@ -14,21 +14,10 @@ require("dotenv").config();
 
 const host = process.env.HOST;
 const port = process.env.PORT;
-const secretKey = process.env.SECRET_KEY;
 const frontendPath = (...p) => path.join(__dirname, "../frontend", ...p);
 
 const app = express();
 const server = http.createServer(app);
-
-const sessionMiddleware = session({
-    secret: secretKey,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        httpOnly: true,
-        maxAge: 1000 * 60 * 60
-    }
-});
 
 initWebSocket(server, sessionMiddleware);
 
@@ -36,7 +25,6 @@ app.use(express.json());
 app.use(express.static(frontendPath("public")));
 
 app.use(sessionMiddleware);
-
 
 // --------------------
 // PAGES
@@ -64,25 +52,25 @@ app.post("/api/logout", auth.logout);
 // --------------------
 // LOBBY ROUTES
 // --------------------
-app.post("/api/lobby/new", lobby.newLobby);
-app.post("/api/lobby/join", lobby.joinLobby);
-app.post("/api/lobby/kick", lobby.kickOpponent);
-app.delete("/api/lobby/leave", lobby.leaveLobby);
-app.post("/api/lobby/ready", lobby.setReady);
+app.post("/api/lobby/new", authMiddleware, lobby.newLobby);
+app.post("/api/lobby/join", authMiddleware, lobby.joinLobby);
+app.post("/api/lobby/kick", authMiddleware, lobbyMiddleware, lobby.kickOpponent);
+app.delete("/api/lobby/leave", authMiddleware, lobbyMiddleware, lobby.leaveLobby);
+app.post("/api/lobby/ready", authMiddleware, lobbyMiddleware, lobby.setReady);
 
 // --------------------
 // GAME ROUTES
 // --------------------
-app.post("/api/game/start", game.startGame);
+app.post("/api/game/start", authMiddleware, game.startGame);
 
-app.post("/api/game/draw", game.drawCard);
-app.post("/api/game/place", game.placeCard);
-app.post("/api/game/sacrifice", game.sacrificeCard);
-app.post("/api/game/end-place", game.endPlacePhase);
-app.delete("/api/game/end", game.endGame);
+app.post("/api/game/draw", authMiddleware, gameMiddleware, game.drawCard);
+app.post("/api/game/place", authMiddleware, gameMiddleware, game.placeCard);
+app.post("/api/game/sacrifice", authMiddleware, gameMiddleware, game.sacrificeCard);
+app.post("/api/game/end-place", authMiddleware, gameMiddleware, game.endPlacePhase);
+app.delete("/api/game/end", authMiddleware, gameMiddleware, game.endGame);
 
-app.get("/api/game/board", game.getGameboard);
-app.get("/api/game/hand", game.getHand);
+app.get("/api/game/board", authMiddleware, gameMiddleware, game.getGameboard);
+app.get("/api/game/hand", authMiddleware, gameMiddleware, game.getHand);
 
 
 // 404

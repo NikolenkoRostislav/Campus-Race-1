@@ -18,22 +18,7 @@ class GameController {
     static endGame(req, res) {
         try {
             const { roomID } = req.body;
-            const userID = req.session.user?.id;
-            if (!roomID) {
-                return res.status(422).json({ message: "Missing roomID" });
-            }
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
-            if (GameController.getSide(roomID, userID) === null) {
-                return res.status(403).json({ message: "Only a player can end the game" });
-            }
-            const room = LobbyController.lobbies.get(roomID);
-            if (!room) {
-                return res.status(404).json({ message: "Lobby not found" });
-            }
             GameController.rooms.delete(roomID);
-
             return res.status(204);
         } catch (err) {
             console.error(err);
@@ -44,14 +29,7 @@ class GameController {
     static startGame(req, res) {
         try {
             const { roomID } = req.body;
-            const userID = req.session.user?.id;
-
-            if (!roomID) {
-                return res.status(422).json({ message: "Missing roomID" });
-            }
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
+            const userID = req.session.user.id;
 
             const lobby = LobbyController.lobbies.get(roomID);
 
@@ -120,23 +98,16 @@ class GameController {
     static drawCard(req, res) {
         try {
             const { roomID, random } = req.body;
-            const userID = req.session.user?.id;
+            const userID = req.session.user.id;
 
             const room = GameController.getRoomOrFail(roomID);
-            if (!room) {
-                return res.status(404).json({ message: "Game not found" });
-            }
-
             const side = GameController.getSide(roomID, userID);
-            if (!side) {
-                return res.status(403).json({ message: "Invalid player" });
-            }
 
             const result = room.drawCard(side, random);
-
             if (!result) {
                 return res.status(403).json({ message: "Can't do this" });
             }
+
             GameController.sendToRoom(roomID, "card_taken", { userID, hand: result.hand });
             return res.json(result);
         } catch (err) {
@@ -148,20 +119,10 @@ class GameController {
     static placeCard(req, res) {
         try {
             const { roomID, x, cardID } = req.body;
-            const userID = req.session.user?.id;
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
+            const userID = req.session.user.id;
 
             const room = GameController.getRoomOrFail(roomID);
-            if (!room) {
-                return res.status(404).json({ message: "Game not found" });
-            }
-
             const side = GameController.getSide(roomID, userID);
-            if (!side) {
-                return res.status(403).json({ message: "Invalid player" });
-            }
 
             const result = room.placeCard(side, x, cardID);
             if (!result) {
@@ -179,16 +140,10 @@ class GameController {
     static sacrificeCard(req, res) {
         try {
             const { roomID, x } = req.body;
-            const userID = req.session.user?.id;
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
+            const userID = req.session.user.id;
 
             const room = GameController.getRoomOrFail(roomID);
-            if (!room) return res.status(404).json({ message: "Game not found" });
-
             const side = GameController.getSide(roomID, userID);
-            if (!side) return res.status(403).json({ message: "Invalid player" });
 
             const result = room.sacrificeCard(side, x);
             if (!result) return res.status(403).json({ message: "Can't do this" });
@@ -205,16 +160,10 @@ class GameController {
     static endPlacePhase(req, res) {
         try {
             const { roomID } = req.body;
-            const userID = req.session.user?.id;
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
+            const userID = req.session.user.id;
 
             const room = GameController.getRoomOrFail(roomID);
-            if (!room) return res.status(404).json({ success: false });
-
             const side = GameController.getSide(roomID, userID);
-            if (!side) return res.status(403).json({ success: false });
 
             const result = room.endPlacePhase(side);
 
@@ -231,9 +180,6 @@ class GameController {
             const { roomID } = req.query;
 
             const room = GameController.getRoomOrFail(roomID);
-            if (!room) {
-                return res.status(404).json({ success: false });
-            }
 
             return res.json({
                 board: Object.fromEntries(room.game.gameBoard.board)
@@ -247,16 +193,10 @@ class GameController {
     static getHand(req, res) {
         try {
             const { roomID } = req.query;
-            const userID = req.session.user?.id;
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
+            const userID = req.session.user.id;
 
             const room = GameController.getRoomOrFail(roomID);
-            if (!room) return res.status(404).json({ success: false });
-
             const side = GameController.getSide(roomID, userID);
-            if (!side) return res.status(403).json({ success: false });
 
             return res.json({
                 hand: room.game.getPlayer(side).hand

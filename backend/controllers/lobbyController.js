@@ -6,17 +6,9 @@ class LobbyController {
     static leaveLobby(req, res) {
         try {
             const { roomID } = req.body;
-            const userID = req.session.user?.id;
-            if (!roomID) {
-                return res.status(422).json({ message: "Missing roomID" });
-            }
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
+            const userID = req.session.user.id;
+
             const lobby = LobbyController.lobbies.get(roomID);
-            if (!lobby) {
-                return res.status(404).json({ message: "Lobby not found" });
-            }
             if (lobby.opponentID == userID) {
                 lobby.opponentID = null;
                 return res.status(204);
@@ -35,12 +27,7 @@ class LobbyController {
 
     static newLobby(req, res) {
         try {
-            const userID = req.session.user?.id;
-
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
-
+            const userID = req.session.user.id;
             const lobby = new Lobby(userID);
 
             LobbyController.lobbies.set(lobby.roomID, lobby);
@@ -55,22 +42,11 @@ class LobbyController {
     static joinLobby(req, res) {
         try {
             const { roomID } = req.body;
-            const userID = req.session.user?.id;
+            const userID = req.session.user.id;
 
-            if (!roomID) {
-                return res.status(422).json({ message: "Missing roomID" });
-            }
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
             const lobby = LobbyController.lobbies.get(roomID);
 
-            if (!lobby) {
-                return res.status(404).json({ message: "Lobby not found" });
-            }
-
             const ok = lobby.addOpponent(userID);
-
             return res.json({ success: ok });
 
         } catch (err) {
@@ -82,26 +58,15 @@ class LobbyController {
     static kickOpponent(req, res) {
         try {
             const { roomID } = req.body;
-            const userID = req.session.user?.id;
+            const userID = req.session.user.id;
 
-            if (!roomID) {
-                return res.status(422).json({ message: "Missing roomID" });
-            }
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
             const lobby = LobbyController.lobbies.get(roomID);
-
-            if (!lobby) {
-                return res.status(404).json({ message: "Lobby not found" });
-            }
 
             if (lobby.creatorID !== userID) {
                 return res.status(403).json({ message: "Only creator can kick" });
             }
 
             lobby.opponentID = null;
-
             return res.status(204);
 
         } catch (err) {
@@ -113,26 +78,14 @@ class LobbyController {
     static setReady(req, res) {
         try {
             const { roomID } = req.body;
-            const userID = req.session.user?.id;
+            const userID = req.session.user.id;
 
-            if (!roomID) {
-                return res.status(422).json({ message: "Missing roomID" });
-            }
-            if (!userID) {
-                return res.status(401).json({ message: "Not authenticated" });
-            }
             const lobby = LobbyController.lobbies.get(roomID);
 
-            if (!lobby) {
-                return res.status(404).json({ message: "Lobby not found" });
-            }
-
             lobby.setReady(userID);
-
             return res.json({
                 success: true
             });
-
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message: "something went wrong" });
