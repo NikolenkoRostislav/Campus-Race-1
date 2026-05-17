@@ -44,6 +44,10 @@ app.get("/create-room", (req, res) => {
     res.sendFile(frontendPath("views", "create_room.html"));
 });
 
+app.get("/game", (req, res) => {
+    res.sendFile(frontendPath("views", "game.html"));
+});
+
 // --------------------
 // AUTH
 // --------------------
