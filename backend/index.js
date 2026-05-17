@@ -66,7 +66,6 @@ app.patch("/api/user/pfp_url", authMiddleware, user.updatePFP);
 // --------------------
 app.post("/api/lobby/new", authMiddleware, lobby.newLobby);
 app.post("/api/lobby/join", authMiddleware, lobby.joinLobby);
-app.post("/api/lobby/kick", authMiddleware, lobbyMiddleware, lobby.kickOpponent);
 app.delete("/api/lobby/leave", authMiddleware, lobbyMiddleware, lobby.leaveLobby);
 app.post("/api/lobby/ready", authMiddleware, lobbyMiddleware, lobby.setReady);
 

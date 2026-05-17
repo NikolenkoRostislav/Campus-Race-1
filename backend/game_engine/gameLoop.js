@@ -88,7 +88,7 @@ class GameLoop extends EventEmitter {
 
     handleP1Battle() {
         let log = this.game.battle(1);
-        this.emit("battle_completed", log);
+        this.emit("battle_completed", { battleLog: log });
 
         this.timer = setTimeout(() => {
             this.game.turn++;

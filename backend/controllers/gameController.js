@@ -17,7 +17,7 @@ class GameController {
 
     static endGame(req, res) {
         try {
-            const { roomID } = req.body;
+            const roomID = req.query.roomID;
             GameController.rooms.delete(roomID);
             return res.status(204);
         } catch (err) {
@@ -50,10 +50,10 @@ class GameController {
             const gameLoop = new GameLoop(roomID, p1ID, p2ID);
 
             gameLoop.on("state_changed", (data) => {
-                GameController.sendToRoom(roomID, "state_changed", data);
+                GameController.sendToRoom(roomID, "state_changed", { newState: data.newState });
             });
             gameLoop.on("battle_completed", (data) => {
-                GameController.sendToRoom(roomID, "battle_completed", data);
+                GameController.sendToRoom(roomID, "battle_completed", { battleLog: data.battleLog });
             });
 
             GameController.rooms.set(roomID, gameLoop);
@@ -128,7 +128,7 @@ class GameController {
             if (!result) {
                 return res.status(403).json({ message: "Can't do this" });
             }
-            GameController.sendToRoom(roomID, "card_placed", result);
+            GameController.sendToRoom(roomID, "card_placed", { board: result.board, hand: result.hand, energy: result.energy, userID });
             return res.json(result);
 
         } catch (err) {
@@ -147,7 +147,7 @@ class GameController {
 
             const result = room.sacrificeCard(side, x);
             if (!result) return res.status(403).json({ message: "Can't do this" });
-            GameController.sendToRoom(roomID, "card_sacrificed", result);
+            GameController.sendToRoom(roomID, "card_sacrificed", { board: result.board, energy: result.energy, userID });
 
             return res.json(result);
 
@@ -165,7 +165,8 @@ class GameController {
             const room = GameController.getRoomOrFail(roomID);
             const side = GameController.getSide(roomID, userID);
 
-            const result = room.endPlacePhase(side);
+            const result = room.endPlacePhase(side); //bool
+            if (!result) return res.status(403).json({ message: "Can't do this" });
 
             return res.json({ success: result });
 
