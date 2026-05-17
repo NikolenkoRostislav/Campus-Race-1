@@ -40,14 +40,19 @@ app.get("/login", (req, res) => {
     res.sendFile(frontendPath("views", "login.html"));
 });
 
-app.get("/create-room", (req, res) => {
-    res.sendFile(frontendPath("views", "create_room.html"));
-});
-
 app.get("/game", (req, res) => {
     res.sendFile(frontendPath("views", "game.html"));
 });
 
+app.get("/lobby", (req, res) => {
+    const { roomID } = req.query;
+
+    if (!roomID) {
+        return res.redirect("/");
+    }
+
+    res.sendFile(frontendPath("views", "lobby.html"));
+});
 // --------------------
 // AUTH
 // --------------------
@@ -60,14 +65,15 @@ app.post("/api/logout", auth.logout);
 // USER
 // --------------------
 app.patch("/api/user/pfp_url", authMiddleware, user.updatePFP);
+app.get("/api/user", authMiddleware, user.getUserByID);
 
 // --------------------
 // LOBBY ROUTES
 // --------------------
+app.get("/api/lobby/members", authMiddleware, lobby.getLobbyMembers);
 app.post("/api/lobby/new", authMiddleware, lobby.newLobby);
 app.post("/api/lobby/join", authMiddleware, lobby.joinLobby);
 app.delete("/api/lobby/leave", authMiddleware, lobbyMiddleware, lobby.leaveLobby);
-app.post("/api/lobby/ready", authMiddleware, lobbyMiddleware, lobby.setReady);
 
 // --------------------
 // GAME ROUTES

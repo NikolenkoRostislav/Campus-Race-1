@@ -11,15 +11,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const createRoomBtn = document.getElementById("createRoomBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
+    const joinForm = document.getElementById("joinRoomForm");
+    const profileForm = document.getElementById("profileForm");
+
     function hideAllViews() {
         dashboardView.classList.add("hidden");
         joinRoomView.classList.add("hidden");
         profileView.classList.add("hidden");
     }
-
-    createRoomBtn.addEventListener("click", () => {
-        window.location.href = "/create-room";
-    });
 
     showJoinRoomBtn.addEventListener("click", () => {
         hideAllViews();
@@ -31,42 +30,98 @@ document.addEventListener("DOMContentLoaded", () => {
         profileView.classList.remove("hidden");
     });
 
-    async function checkAuth() {
-        const res = await fetch("/api/me");
-        const data = await res.json();
+    createRoomBtn.addEventListener("click", async () => {
+        try {
+            const res = await createLobby();
 
-        if (!data.loggedIn) {
-            window.location.href = "/login";
-            return;
+            const roomID = res.roomID || res;
+
+            window.location.href = `/lobby?roomID=${roomID}`;
+        } catch (e) {
+            console.error("Create lobby failed:", e);
         }
-        
-        userIDText.textContent = `User ID: ${data.user.id}`;
-        
-        if (data.user.avatar_url) {
-            userAvatar.src = data.user.avatar_url;
-            userAvatar.style.display = "block";
+    });
+
+    joinForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const roomID = new FormData(joinForm).get("roomId");
+        const msg = document.getElementById("joinMessage");
+
+        try {
+            msg.textContent = "Connecting...";
+            msg.style.color = "#333";
+
+            await joinLobby(roomID);
+
+            window.location.href = `/lobby?roomID=${roomID}`;
+        } catch (e) {
+            console.error("Join lobby failed:", e);
+
+            msg.textContent = "Failed to join room";
+            msg.style.color = "red";
+        }
+    });
+
+    profileForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const msg = document.getElementById("profileMessage");
+
+        try {
+            const form = new FormData(profileForm);
+            const url = form.get("avatarUrl");
+
+            if (url) {
+                await updatePfpUrl(url);
+            }
+
+            msg.textContent = "Profile updated!";
+            msg.style.color = "green";
+        } catch (e) {
+            console.error(e);
+
+            msg.textContent = "Failed to update profile";
+            msg.style.color = "red";
+        }
+    });
+
+    async function checkAuth() {
+        try {
+            const res = await fetch("/api/me", {
+                credentials: "include"
+            });
+
+            const data = await res.json();
+
+            if (!data.loggedIn) {
+                window.location.href = "/login";
+                return;
+            }
+
+            userIDText.textContent = `User ID: ${data.user.id}`;
+
+            if (data.user.avatar_url) {
+                userAvatar.src = data.user.avatar_url;
+                userAvatar.style.display = "block";
+            }
+        } catch (e) {
+            console.error("Auth check failed:", e);
         }
     }
 
     checkAuth();
 
     logoutBtn.addEventListener("click", async () => {
-        await fetch("/api/logout", { method: "POST" });
-        await checkAuth();
-    });
+        try {
+            await fetch("/api/logout", {
+                method: "POST",
+                credentials: "include"
+            });
 
-    document.getElementById("joinRoomForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const roomId = e.target.roomId.value;
-        const msg = document.getElementById("joinMessage");
-        msg.textContent = `Connecting to room ${roomId}...`;
-        msg.style.color = "#333";
-    });
-
-    document.getElementById("profileForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const msg = document.getElementById("profileMessage");
-        msg.textContent = "Profile updating... (requires backend setup)";
-        msg.style.color = "green";
+            window.location.href = "/login";
+        } catch (e) {
+            console.error("Logout failed:", e);
+        }
     });
 });

@@ -18,6 +18,20 @@ class UserController {
             return res.status(500).json({ message: "Server error" });
         }
     }
+
+    static async getUserByID(req, res) {
+        try {
+            const userID = req.query.id;
+            const user = await User.findById(userID);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+            return res.status(200).json({ login: user.login, pfp_url: user.pfp_url });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Server error" });
+        }
+    }
 }
 
 module.exports = UserController;

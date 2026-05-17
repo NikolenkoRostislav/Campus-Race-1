@@ -26,8 +26,8 @@ class LobbyController {
             if (lobby.creatorID !== userID) {
                 return res.status(403).json({ message: "Only creator can delete lobby" });
             }
-            LobbyController.lobbies.delete(roomID);
             LobbyController.sendToRoom(roomID, "lobby_deleted");
+            LobbyController.lobbies.delete(roomID);
 
             return res.status(204);
         } catch (err) {
@@ -56,6 +56,7 @@ class LobbyController {
             const userID = req.session.user.id;
 
             const lobby = LobbyController.lobbies.get(roomID);
+            if (!lobby) return res.status(404).json({ message: "Lobby with id " + roomID + " not found" });
 
             const ok = lobby.addOpponent(userID);
             if (!ok) return res.status(400).json({ message: "Lobby is full" });
@@ -68,18 +69,13 @@ class LobbyController {
         }
     }
 
-    static setReady(req, res) {
+    static getLobbyMembers(req, res) {
         try {
-            const { roomID } = req.body;
-            const userID = req.session.user.id;
-
+            const roomID = req.query.roomID;
             const lobby = LobbyController.lobbies.get(roomID);
+            if (!lobby) return res.status(404).json({ message: "Lobby not found" });
 
-            lobby.setReady(userID);
-            LobbyController.sendToRoom(roomID, "ready", { userID });
-            return res.json({
-                success: true
-            });
+            return res.json({ creatorID: lobby.creatorID, opponentID: lobby?.opponentID });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message: "something went wrong" });

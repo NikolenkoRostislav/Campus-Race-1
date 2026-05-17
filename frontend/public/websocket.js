@@ -1,15 +1,10 @@
+let socket;
+
 function initSocket() {
-    let socket = io({
+    socket = io({
         withCredentials: true
     });
-
-    socket.on("connect", () => {
-        console.log("Socket connected:", socket.id);
-    });
-
-    socket.on("disconnect", () => {
-        console.log("Socket disconnected");
-    });
+    window.socket = socket;
 
     // --------------------
     // LOBBY EVENTS
@@ -24,11 +19,6 @@ function initSocket() {
 
     socket.on("lobby_deleted", () => {
         console.log("Lobby deleted");
-        window.location.href = "/";
-    });
-
-    socket.on("ready", ({ userID }) => {
-        console.log("Ready update:", userID);
     });
 
     // --------------------

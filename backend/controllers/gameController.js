@@ -29,11 +29,10 @@ class GameController {
     static startGame(req, res) {
         try {
             const { roomID } = req.body;
-            const userID = req.session.user.id;
 
             const lobby = LobbyController.lobbies.get(roomID);
 
-            if (!lobby || !lobby.canStartGame() || lobby.creatorID !== userID) {
+            if (!lobby || !lobby.opponentID) {
                 return res.status(403).json({
                     success: false,
                     message: "Cannot start game"
