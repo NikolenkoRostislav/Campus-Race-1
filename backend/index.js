@@ -25,7 +25,7 @@ app.use(express.json());
 
 app.use(express.static(frontendPath("public")));
 
-app.use('/assets', express.static(path.join(__dirname, "../assets")));
+app.use('/assets', express.static(frontendPath("assets")));
 
 app.use(sessionMiddleware);
 
