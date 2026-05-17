@@ -55,6 +55,7 @@ function updateHP(containerId, hpAmount) {
     */
 }
 
+// --- HAND DISPLAY LOGIC ---
 function updateHand(cardCount) {
     const handContainer = document.getElementById('player-hand');
     if (!handContainer) return;
@@ -62,7 +63,25 @@ function updateHand(cardCount) {
     handContainer.innerHTML = '';
     if (cardCount <= 0) return;
 
-    const angleStep = 10; 
+    const maxTotalAngle = 40; 
+    const preferredAngleStep = 10; 
+    
+    let angleStep = preferredAngleStep;
+    if (cardCount > 1) {
+        angleStep = Math.min(preferredAngleStep, maxTotalAngle / (cardCount - 1));
+    } else {
+        angleStep = 0;
+    }
+
+    let overlap = -100; 
+    
+    if (cardCount > 8) {
+        overlap = -104;
+    }
+    if (cardCount > 15) {
+        overlap = -107; 
+    }
+
     const yStep = 2; 
     const middleIndex = (cardCount - 1) / 2;
 
@@ -72,10 +91,12 @@ function updateHand(cardCount) {
 
         const offset = i - middleIndex;
         const angle = offset * angleStep;
-        const yOffset = Math.abs(offset) * yStep; 
+        
+        const yOffset = Math.abs(offset) * yStep * (angleStep / preferredAngleStep); 
 
         card.style.setProperty('--card-angle', `${angle}deg`);
         card.style.setProperty('--card-y', yOffset);
+        card.style.setProperty('--overlap', overlap);
         card.style.zIndex = i;
 
         handContainer.appendChild(card);
@@ -86,24 +107,28 @@ function updateHand(cardCount) {
 
 let selectedCard = null;
 
+function selectCard(card) {
+    if (!card) return;
+
+    if (selectedCard === card) {
+        clearSelection();
+        return;
+    }
+
+    clearSelection();
+    selectedCard = card;
+    selectedCard.classList.add('selected');
+    highlightValidSlots();
+}
+
 // Initialize card interaction
 function setupCardInteractions() {
-    // Select card in hand
+    // Select card in hand via click
     const handContainer = document.getElementById('player-hand');
     if (handContainer) {
         handContainer.addEventListener('click', (e) => {
             const card = e.target.closest('.hand-card');
-            if (!card) return;
-
-            if (selectedCard === card) {
-                clearSelection();
-                return;
-            }
-
-            clearSelection();
-            selectedCard = card;
-            selectedCard.classList.add('selected');
-            highlightValidSlots();
+            selectCard(card);
         });
     }
 
@@ -117,6 +142,28 @@ function setupCardInteractions() {
         });
     });
 }
+
+// --- KEYBOARD NAVIGATION(Beetwen cards in hand) ---
+document.addEventListener('keydown', (event) => {
+    if (!selectedCard) return;
+
+    const handCards = Array.from(document.querySelectorAll('.hand-card'));
+    if (handCards.length === 0) return;
+
+    const currentIndex = handCards.indexOf(selectedCard);
+    
+    if (event.key === 'ArrowLeft') {
+        if (currentIndex > 0) {
+            selectCard(handCards[currentIndex - 1]);
+        }
+    } else if (event.key === 'ArrowRight') {
+        if (currentIndex < handCards.length - 1) {
+            selectCard(handCards[currentIndex + 1]);
+        }
+    } else if (event.key === 'Escape') {
+        clearSelection();
+    }
+});
 
 // Highlight card slots 
 function highlightValidSlots() {
