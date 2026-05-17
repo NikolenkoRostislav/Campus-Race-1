@@ -3,68 +3,47 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Tavern - Auth</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/auth.js" defer></script>
 </head>
 
-<body>
-    <div class="card">
-        <div id="loginView">
-            <h2>Login</h2>
+<body style="--page-bg: url('/assets/Bar1.png');">
 
-            <form id="loginForm">
-                <input name="login" placeholder="Login" required />
-                <input type="password" name="password" placeholder="Password" required />
-                <button type="submit">Login</button>
-                <button id="goRegister" type="button">Create account</button>
-            </form>
+    <div class="auth-layout">
+        
+        <div class="nav-buttons">
+            <button id="showLoginBtn" class="img-btn" style="background-image: url('/assets/Login.png');"></button>
+            
+            <button id="showRegisterBtn" class="img-btn" style="background-image: url('/assets/Register.png');"></button>
+        </div>
 
-            <p id="message"></p>
+        <div class="form-panel">
+            
+            <div id="loginSection">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <input name="login" placeholder="Login" required />
+                    <input type="password" name="password" placeholder="Password" required />
+                    <button type="submit" class="submit-btn">Enter Tavern</button>
+                </form>
+                <p id="loginMessage" class="message"></p>
+            </div>
+
+            <div id="registerSection" class="hidden">
+                <h2>Register</h2>
+                <form id="registerForm">
+                    <input name="login" placeholder="Login" required />
+                    <input type="password" name="password" placeholder="Password" required />
+                    <input type="password" name="confirmPassword" placeholder="Confirm password" required />
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+                <p id="registerMessage" class="message"></p>
+            </div>
+
         </div>
     </div>
 
-    <script>
-        const form = document.getElementById("loginForm");
-        const message = document.getElementById("message");
-
-        async function checkAuth() {
-            const res = await fetch("/api/me");
-            const data = await res.json();
-
-            if (data.loggedIn) {
-                window.location.href = "/";
-                return;
-            }
-        }
-
-        checkAuth();
-
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const data = Object.fromEntries(new FormData(form));
-
-            const res = await fetch("/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
-
-            const result = await res.json();
-
-            message.textContent = result.message;
-            message.style.color = result.success ? "green" : "red";
-
-            if (result.success) {
-                form.reset();
-                await checkAuth();
-            }
-        });
-
-        document.getElementById("goRegister").addEventListener("click", () => {
-            window.location.href = "/register";
-        });
-    </script>
 </body>
 
 </html>

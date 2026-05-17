@@ -1,6 +1,6 @@
 const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
 const http = require("http");
-
 const express = require("express");
 
 const { sessionMiddleware, authMiddleware, lobbyMiddleware, gameMiddleware } = require("./middleware/middleware.js");
@@ -11,10 +11,9 @@ const lobby = require("./controllers/lobbyController.js");
 const game = require("./controllers/gameController.js");
 const user = require("./controllers/userController.js");
 
-require("dotenv").config();
+const host = process.env.HOST || "localhost";
+const port = process.env.PORT || 3000;
 
-const host = process.env.HOST;
-const port = process.env.PORT;
 const frontendPath = (...p) => path.join(__dirname, "../frontend", ...p);
 
 const app = express();
@@ -23,7 +22,10 @@ const server = http.createServer(app);
 initWebSocket(server, sessionMiddleware);
 
 app.use(express.json());
+
 app.use(express.static(frontendPath("public")));
+
+app.use('/assets', express.static(path.join(__dirname, "../assets")));
 
 app.use(sessionMiddleware);
 
@@ -34,12 +36,12 @@ app.get("/", (req, res) => {
     res.sendFile(frontendPath("views", "main_menu.html"));
 });
 
-app.get("/register", (req, res) => {
-    res.sendFile(frontendPath("views", "register.html"));
-});
-
 app.get("/login", (req, res) => {
     res.sendFile(frontendPath("views", "login.html"));
+});
+
+app.get("/create-room", (req, res) => {
+    res.sendFile(frontendPath("views", "create_room.html"));
 });
 
 // --------------------
@@ -78,8 +80,9 @@ app.delete("/api/game/end", authMiddleware, gameMiddleware, game.endGame);
 app.get("/api/game/board", authMiddleware, gameMiddleware, game.getGameboard);
 app.get("/api/game/hand", authMiddleware, gameMiddleware, game.getHand);
 
-
+// --------------------
 // 404
+// --------------------
 app.use((req, res) => {
     res.status(404).sendFile(frontendPath("views", "404.html"));
 });
