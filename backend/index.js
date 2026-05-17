@@ -9,6 +9,7 @@ const auth = require("./controllers/authController.js");
 const register = require("./controllers/registrationController.js");
 const lobby = require("./controllers/lobbyController.js");
 const game = require("./controllers/gameController.js");
+const user = require("./controllers/userController.js");
 
 require("dotenv").config();
 
@@ -48,6 +49,11 @@ app.post("/api/register", register.register);
 app.post("/api/login", auth.login);
 app.get("/api/me", auth.me);
 app.post("/api/logout", auth.logout);
+
+// --------------------
+// USER
+// --------------------
+app.patch("/api/user/pfp_url", authMiddleware, user.updatePFP);
 
 // --------------------
 // LOBBY ROUTES

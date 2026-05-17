@@ -26,8 +26,9 @@ class AuthController {
             }
 
             req.session.user = {
+                pfp_url: user.pfp_url,
+                login: user.login,
                 id: user.id,
-                login: user.login
             };
 
             return res.status(200).json({ user: req.session.user });
