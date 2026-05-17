@@ -43,17 +43,19 @@
 
             <div id="profileView" class="form-panel hidden">
                 <h2>Update Avatar</h2>
+
                 <form id="profileForm">
-                    <p style="text-align: left; margin-bottom: 5px; font-weight: bold; color: #333;">URL Image:</p>
-                    <input type="text" name="avatarUrl" placeholder="https://example.com/image.png" />
+                    <p style="text-align: left; margin-bottom: 5px; font-weight: bold; color: #333;">
+                        Avatar URL:
+                    </p>
 
-                    <p style="margin: 10px 0; color: #555; font-weight: bold;">OR</p>
+                    <input type="text" name="avatarUrl" placeholder="https://example.com/image.png" required />
 
-                    <p style="text-align: left; margin-bottom: 5px; font-weight: bold; color: #333;">Upload File:</p>
-                    <input type="file" name="avatarFile" accept="image/png, image/jpeg" class="file-upload" />
-
-                    <button type="submit" class="submit-btn" style="margin-top: 15px;">Save Profile</button>
+                    <button type="submit" class="submit-btn" style="margin-top: 15px;">
+                        Save Profile
+                    </button>
                 </form>
+
                 <p id="profileMessage" class="message"></p>
             </div>
 

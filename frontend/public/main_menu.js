@@ -67,14 +67,23 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
 
         const msg = document.getElementById("profileMessage");
+        const form = new FormData(profileForm);
+        const url = form.get("avatarUrl")?.trim();
+
+        if (!url) {
+            msg.textContent = "Please enter a URL";
+            msg.style.color = "red";
+            return;
+        }
 
         try {
-            const form = new FormData(profileForm);
-            const url = form.get("avatarUrl");
+            msg.textContent = "Saving...";
+            msg.style.color = "#333";
 
-            if (url) {
-                await updatePfpUrl(url);
-            }
+            await updatePfpUrl(url);
+
+            userAvatar.src = url;
+            userAvatar.style.display = "block";
 
             msg.textContent = "Profile updated!";
             msg.style.color = "green";
@@ -98,11 +107,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "/login";
                 return;
             }
+            const userInfo = await getUserByID(data.user.id);
 
-            userIDText.textContent = `User ID: ${data.user.id}`;
+            userIDText.textContent = userInfo.login;
 
-            if (data.user.avatar_url) {
-                userAvatar.src = data.user.avatar_url;
+            if (data.user.pfp_url) {
+                userAvatar.src = userInfo.pfp_url;
                 userAvatar.style.display = "block";
             }
         } catch (e) {
