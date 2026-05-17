@@ -40,6 +40,7 @@ class GameController {
                 });
             }
 
+
             const isCreatorFirst = Math.random() < 0.5;
             // const isCreatorFirst = true;
             const p1ID = isCreatorFirst ? lobby.creatorID : lobby.opponentID;
@@ -57,6 +58,7 @@ class GameController {
             });
 
             GameController.rooms.set(roomID, gameLoop);
+            GameController.sendToRoom(roomID, "game_started", { isCreatorFirst });
 
             return res.status(200).json({
                 success: true,

@@ -1,7 +1,5 @@
-let socket;
-
-export function initSocket() {
-    socket = io({
+function initSocket() {
+    let socket = io({
         withCredentials: true
     });
 
@@ -36,6 +34,10 @@ export function initSocket() {
     // --------------------
     // GAME EVENTS
     // --------------------
+    socket.on("game_started", ({ isCreatorFirst }) => {
+        console.log("Game started:", isCreatorFirst);
+    });
+
     socket.on("state_changed", ({ newState }) => {
         // We get the state enum
         // const States = {
