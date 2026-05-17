@@ -1,0 +1,127 @@
+const { CardType } = require("./card.js");
+
+class AttackCommand {
+    constructor(game, x, attackingSide, battleLog) {
+        this.game = game;
+        this.x = x;
+        this.attackingSide = attackingSide;
+        this.defendingSide = -attackingSide;
+        this.battleLog = battleLog;
+        if (!this.battleLog) this.battleLog = []
+        this.attacker = this.game.gameBoard.get(x, attackingSide);
+    }
+
+    execute() {
+        this.attackLane(this.x);
+    }
+
+    attackLane(targetX) {
+        if (![1, 2, 3, 4].includes(targetX)) return;
+
+        this.battleLog.push({
+            Action: "ATTACK",
+            AttackerCoord: `${this.x}:${this.attackingSide}`,
+            TargetCoord: `${targetX}:${this.defendingSide}`
+        });
+
+        const defender = this.game.gameBoard.get(
+            targetX,
+            this.defendingSide
+        );
+
+        if (!defender) {
+            this.attackPlayer();
+            return
+        };
+
+        this.attackCard(targetX, defender, this.attacker.dmg);
+    }
+
+    attackPlayer() {
+        this.battleLog.push(this.game.damagePlayer(
+            this.defendingSide,
+            this.attacker.dmg
+        ));
+    }
+
+    attackCard(x, defender, damage) {
+        if (![1, 2, 3, 4].includes(x)) return;
+        const defenderHP = defender.takeDamage(damage);
+
+        this.battleLog.push({
+            Action: "CARD_HP_UPDATE",
+            TargetCoord: `${x}:${this.defendingSide}`,
+            NewHP: defenderHP
+        });
+
+        if (defender.isDead()) {
+            this.game.gameBoard.removeCard(x, this.defendingSide);
+            this.battleLog.push({ Action: "CARD_DIE", TargetCoord: `${x}:${this.defendingSide}` });
+        }
+    }
+}
+
+class DoubleAttackCommand extends AttackCommand {
+    execute() {
+        this.attackLane(this.x);
+        this.attackLane(this.x);
+    }
+}
+
+class LeftRightAttackCommand extends AttackCommand {
+    execute() {
+        this.attackLane(this.x - 1);
+        this.attackLane(this.x + 1);
+    }
+}
+
+class TripleAttackCommand extends AttackCommand {
+    execute() {
+        super.attackLane(this.x - 1);
+        super.attackLane(this.x);
+        super.attackLane(this.x + 1);
+    }
+}
+
+class FlyAttackCommand extends AttackCommand {
+    execute() {
+        this.battleLog.push({
+            Action: "ATTACK",
+            AttackerCoord: `${this.x}:${this.attackingSide}`,
+            TargetCoord: `${this.x}:${this.defendingSide}`
+        });
+        this.attackPlayer();
+    }
+}
+
+class InstakillAttackCommand extends AttackCommand {
+    execute() {
+        this.battleLog.push({
+            Action: "ATTACK",
+            AttackerCoord: `${this.x}:${this.attackingSide}`,
+            TargetCoord: `${this.x}:${this.defendingSide}`
+        });
+
+        const defender = this.game.gameBoard.get(
+            this.x,
+            this.defendingSide
+        );
+
+        if (!defender) {
+            this.attackPlayer();
+            return
+        }
+
+        this.attackCard(this.x, defender, 999);
+    }
+}
+
+const AttackCommandRegistry = {
+    [CardType.FLY]: FlyAttackCommand,
+    [CardType.LEFT_RIGHT_ATTACK]: LeftRightAttackCommand,
+    [CardType.DOUBLE_ATTACK]: DoubleAttackCommand,
+    [CardType.THREE_TILE_ATTACK]: TripleAttackCommand,
+    [CardType.INSTAKILL]: InstakillAttackCommand,
+};
+
+module.exports = { AttackCommand, AttackCommandRegistry };
