@@ -1,120 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
-    <title>Lobby</title>
+    <title>Lobby - Tavern Game</title>
     <link rel="stylesheet" href="/styles.css">
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/api.js"></script>
+    <script src="/websocket.js"></script>
+    <script src="/lobby.js" defer></script>
 </head>
 
-<body>
-    <div class="lobby-container">
+<body style="--page-bg: url('/assets/LobbyBg.png');">
 
-        <button class="leave-btn" id="leaveBtn">LEAVE</button>
+    <div class="lobby-layout">
 
-        <div class="room-id">
-            ROOM ID: <span id="roomId">123456</span>
+        <button id="leaveBtn" class="leave-btn"
+            style="background-image: url('/assets/Leave.png');"></button>
+
+        
+        
+        <div class="lobby-panel">
+            <div class="room-id" id="roomIdContainer" style="cursor: pointer;" title="Click to copy">
+                Room ID: <span id="roomId">Loading...</span>
+                <span id="copyTooltip" class="copy-tooltip">Copied!</span>
+            </div>
+            <div class="players-list" id="playersList">
+                <div id="username1">Player 1</div>
+                <div id="username2">Player 2</div>
+            </div>
+
+            <button id="startGameBtn" class="start-game-btn"
+                style="background-image: url('/assets/StartGame.png');"></button>
         </div>
 
-        <div class="players" id="playersList">
-            <div id="username1">Username1</div>
-            <div id="username2">Username2</div>
-        </div>
-
-        <button class="start-btn" id="startGameBtn">START GAME</button>
     </div>
+
 </body>
-
-<script src="/socket.io/socket.io.js"></script>
-<script src="/api.js"></script>
-<script src="/websocket.js"></script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", async () => {
-        initSocket();
-
-        const params = new URLSearchParams(window.location.search);
-        const roomID = params.get("roomID");
-
-        if (!roomID) {
-            window.location.href = "/";
-            return;
-        }
-
-        document.getElementById("roomId").textContent = roomID;
-
-        const username1 = document.getElementById("username1");
-        const username2 = document.getElementById("username2");
-
-        let contextCreatorID = null;
-
-        async function refreshLobby() {
-            try {
-                const { creatorID, opponentID } = await getLobbyMembers(roomID);
-                contextCreatorID = creatorID; // Тепер змінна безпечно оновлюється
-
-                const creator = await getUserByID(creatorID);
-                username1.textContent = creator.login;
-
-                if (opponentID) {
-                    const opponent = await getUserByID(opponentID);
-                    username2.textContent = opponent.login;
-                } else {
-                    username2.textContent = "Waiting for player...";
-                }
-
-            } catch (e) {
-                console.error("Failed to load lobby members:", e);
-            }
-        }
-
-        await refreshLobby();
-
-        // --------------------
-        // BUTTONS
-        // --------------------
-        document.getElementById("leaveBtn").onclick = async () => {
-            try {
-                window.location.href = "/";
-                await leaveLobby(roomID);
-            } catch (e) {
-                console.error("Leave lobby failed:", e);
-            }
-        };
-
-        document.getElementById("startGameBtn").onclick = async () => {
-            try {
-                await startGame(roomID);
-            } catch (e) {
-                console.error("Start game failed:", e);
-            }
-        };
-
-        // --------------------
-        // SOCKET EVENTS
-        // --------------------
-        window.socket.on("opponent_joined", refreshLobby);
-        window.socket.on("opponent_left", refreshLobby);
-
-        window.socket.on("lobby_deleted", () => {
-            window.location.href = "/";
-        });
-
-        window.socket.on("game_started", async ({ isCreatorFirst }) => {
-            try {
-                const res = await fetch("/api/me");
-                const data = await res.json();
-                const myID = data.user.id;
-
-                const mySide = (myID === contextCreatorID) ? (isCreatorFirst ? 1 : -1) : (isCreatorFirst ? -1 : 1);
-
-                window.location.href = `/game?roomID=${roomID}&side=${mySide}`;
-            } catch (err) {
-                console.error("Redirection parsing error:", err);
-                window.location.href = `/game?roomID=${roomID}`;
-            }
-        });
-    });
-</script>
-
 </html>
