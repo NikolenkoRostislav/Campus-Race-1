@@ -33,7 +33,7 @@ class Game {
         const newHP = this.getPlayer(side).getDamage(dmg);
         let playerDamageLog = {
             Action: "PLAYER_HP_UPDATE",
-            Side: this.defendingSide,
+            Side: side,
             NewHP: newHP
         };
         return playerDamageLog

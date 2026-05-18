@@ -25,7 +25,9 @@ class GameLoop extends EventEmitter {
         this.state = null;
         this.timer = null;
 
-        this.enterState(States.P1_PLACE);
+        setImmediate(() => {
+            this.enterState(States.P1_PLACE);
+        });
     }
 
     clearTimer() {
@@ -39,9 +41,15 @@ class GameLoop extends EventEmitter {
         this.clearTimer();
 
         this.state = state;
+
         this.emit("state_changed", {
             id: this.id,
             newState: this.state,
+            board: Object.fromEntries(this.game.gameBoard.board),
+            handP1: this.game.getPlayer(1).hand,
+            handP2: this.game.getPlayer(-1).hand,
+            energyP1: this.game.getPlayer(1).energy,
+            energyP2: this.game.getPlayer(-1).energy
         });
 
         switch (state) {
@@ -113,7 +121,7 @@ class GameLoop extends EventEmitter {
 
     handleP2Battle() {
         let log = this.game.battle(-1);
-        this.emit("battle_completed", log);
+        this.emit("battle_completed", { battleLog: log });
 
         this.timer = setTimeout(() => {
             this.game.turn++;

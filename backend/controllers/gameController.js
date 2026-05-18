@@ -50,7 +50,14 @@ class GameController {
             const gameLoop = new GameLoop(roomID, p1ID, p2ID);
 
             gameLoop.on("state_changed", (data) => {
-                GameController.sendToRoom(roomID, "state_changed", { newState: data.newState });
+                GameController.sendToRoom(roomID, "state_changed", { 
+                    newState: data.newState,
+                    board: data.board,
+                    handP1: data.handP1,
+                    handP2: data.handP2,
+                    energyP1: data.energyP1,
+                    energyP2: data.energyP2
+                });
             });
             gameLoop.on("battle_completed", (data) => {
                 GameController.sendToRoom(roomID, "battle_completed", { battleLog: data.battleLog });
@@ -184,7 +191,8 @@ class GameController {
             const room = GameController.getRoomOrFail(roomID);
 
             return res.json({
-                board: Object.fromEntries(room.game.gameBoard.board)
+                board: Object.fromEntries(room.game.gameBoard.board),
+                currentState: room.state
             });
         } catch (err) {
             console.error(err);

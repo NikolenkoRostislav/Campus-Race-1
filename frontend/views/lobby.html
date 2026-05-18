@@ -24,9 +24,11 @@
         <button class="start-btn" id="startGameBtn">START GAME</button>
     </div>
 </body>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="/api.js"></script>
 <script src="/websocket.js"></script>
+
 <script>
     document.addEventListener("DOMContentLoaded", async () => {
         initSocket();
@@ -44,14 +46,12 @@
         const username1 = document.getElementById("username1");
         const username2 = document.getElementById("username2");
 
-        // --------------------
-        // LOAD INITIAL STATE
-        // --------------------
-        await refreshLobby();
+        let contextCreatorID = null;
 
         async function refreshLobby() {
             try {
                 const { creatorID, opponentID } = await getLobbyMembers(roomID);
+                contextCreatorID = creatorID; // Тепер змінна безпечно оновлюється
 
                 const creator = await getUserByID(creatorID);
                 username1.textContent = creator.login;
@@ -67,6 +67,8 @@
                 console.error("Failed to load lobby members:", e);
             }
         }
+
+        await refreshLobby();
 
         // --------------------
         // BUTTONS
@@ -98,8 +100,19 @@
             window.location.href = "/";
         });
 
-        window.socket.on("game_started", () => {
-            window.location.href = "/game";
+        window.socket.on("game_started", async ({ isCreatorFirst }) => {
+            try {
+                const res = await fetch("/api/me");
+                const data = await res.json();
+                const myID = data.user.id;
+
+                const mySide = (myID === contextCreatorID) ? (isCreatorFirst ? 1 : -1) : (isCreatorFirst ? -1 : 1);
+
+                window.location.href = `/game?roomID=${roomID}&side=${mySide}`;
+            } catch (err) {
+                console.error("Redirection parsing error:", err);
+                window.location.href = `/game?roomID=${roomID}`;
+            }
         });
     });
 </script>

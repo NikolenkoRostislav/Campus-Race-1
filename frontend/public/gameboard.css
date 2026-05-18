@@ -43,7 +43,7 @@ html, body {
     overflow: hidden;
 }
 
-/* --- Profile and HP UI ---*/
+/* Profile and HP UI */
 .profile-container {
     position: absolute;
     top: calc(10 * var(--px));
@@ -149,10 +149,23 @@ html, body {
 .card-slot.highlight {
     box-shadow: 
         0 0 calc(25 * var(--px)) rgba(20, 235, 0, 0.6), 
-        inset 0 0 calc(25 * var(--px)) rgba(20, 235, 0, 0.6); 
+        inset 0 0 calc(25 * var(--px)) rgba(20, 235, 0, 0.6) !important; 
         
-    cursor: pointer;
+    cursor: pointer !important;
     transition: box-shadow 0.3s ease;
+}
+
+.card-slot.highlight-sacrifice {
+    box-shadow: 
+        0 0 calc(25 * var(--px)) rgba(255, 50, 50, 0.8), 
+        inset 0 0 calc(25 * var(--px)) rgba(255, 50, 50, 0.6) !important; 
+        
+    cursor: crosshair !important;
+    transition: box-shadow 0.3s ease;
+}
+
+.card-slot.occupied.highlight-sacrifice {
+    background-color: rgba(255, 50, 50, 0.15) !important; 
 }
 
 /* Normal occupied state */
@@ -192,8 +205,9 @@ html, body {
     --move-y: 0px;
     --scale: 1;
     --lift-y: 0px;
+    --card-rotation: 0deg;
     
-    transform: translate3d(var(--move-x), calc(var(--move-y) + var(--lift-y)), 0) scale(var(--scale));
+    transform: translate3d(var(--move-x), calc(var(--move-y) + var(--lift-y)), 0) scale(var(--scale)) rotate(var(--card-rotation));
     
     transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s ease;
     will-change: transform, filter;
@@ -258,7 +272,7 @@ html, body {
 }
 
 .hand-card:first-child {
-    margin-left: 0;
+    margin-left: 0 !important;
 }
 
 /* Selected card in hand */
@@ -319,7 +333,7 @@ html, body {
     background-repeat: no-repeat;
 }
 
-/* --- Decks Layout --- */
+/* Decks Layout */
 #decks-container {
     position: absolute;
     bottom: calc(10 * var(--px)); 
@@ -372,4 +386,84 @@ html, body {
 
 #random-deck {
     background-image: url('assets/card_suit.png'); 
+}
+
+/* Card Reveal Overlay */
+#card-reveal-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+    
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#card-reveal-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+#revealed-card {
+    width: calc(224 * var(--px)); 
+    height: calc(300 * var(--px));
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    transform: scale(0.5) translateY(calc(100 * var(--px)));
+    opacity: 0;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    
+    filter: drop-shadow(0 0 calc(40 * var(--px)) rgba(255, 204, 0, 0.8));
+}
+
+#card-reveal-overlay.visible #revealed-card {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.reveal-hint {
+    color: white;
+    font-family: sans-serif;
+    margin-top: calc(30 * var(--px));
+    font-size: calc(20 * var(--px));
+    opacity: 0.7;
+}
+
+/* End turn button */
+.end-turn-btn {
+    position: absolute;
+    right: calc(30 * var(--px));
+    top: 50%;
+    transform: translateY(-50%);
+    
+    padding: calc(15 * var(--px)) calc(25 * var(--px));
+    font-family: 'SpongeBob', sans-serif;
+    font-size: calc(28 * var(--px));
+    background-color: #33ff41;
+    color: white;
+    
+    border: calc(4 * var(--px)) solid white;
+    border-radius: calc(12 * var(--px));
+    box-shadow: 0 calc(5 * var(--px)) calc(15 * var(--px)) rgba(0,0,0, 0.5);
+    cursor: pointer;
+    z-index: 100;
+    
+    display: none;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.end-turn-btn:hover {
+    transform: translateY(-50%) scale(1.1);
+    filter: brightness(1.2);
 }
