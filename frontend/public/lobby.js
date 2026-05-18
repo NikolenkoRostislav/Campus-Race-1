@@ -18,12 +18,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     // --------------------
     // LOAD INITIAL STATE
     // --------------------
-    await refreshLobby();
+
+    let contextCreatorID = null;
+    
 
     async function refreshLobby() {
         try {
             const { creatorID, opponentID } = await getLobbyMembers(roomID);
-
+            contextCreatorID = creatorID;
             const creator = await getUserByID(creatorID);
             username1.textContent = creator.login;
 
@@ -39,9 +41,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    await refreshLobby();
+
     // --------------------
     // BUTTONS
     // --------------------
+
     document.getElementById("leaveBtn").onclick = async () => {
         try {
             window.location.href = "/";
@@ -69,8 +74,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.location.href = "/";
     });
 
-    window.socket.on("game_started", () => {
-        window.location.href = "/game";
+    window.socket.on("game_started", async ({ isCreatorFirst }) => {
+        try {
+            const res = await fetch("/api/me");
+            const data = await res.json();
+            const myID = data.user.id;
+
+            const mySide = (myID === contextCreatorID) ? (isCreatorFirst ? 1 : -1) : (isCreatorFirst ? -1 : 1);
+
+            window.location.href = `/game?roomID=${roomID}&side=${mySide}`;
+        } catch (err) {
+            console.error("Redirection parsing error:", err);
+            window.location.href = `/game?roomID=${roomID}`;
+        }
     });
 
     // --------------------
