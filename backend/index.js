@@ -4,7 +4,8 @@ const http = require("http");
 const express = require("express");
 
 const { sessionMiddleware, authMiddleware, lobbyMiddleware, gameMiddleware } = require("./middleware/middleware.js");
-const { initWebSocket } = require("./websockets/websocket.js");
+const { initWebSocketHandlers } = require("./websockets/websocket.js");
+const { initIO } = require("./websockets/socketManager.js");
 const auth = require("./controllers/authController.js");
 const register = require("./controllers/registrationController.js");
 const lobby = require("./controllers/lobbyController.js");
@@ -19,7 +20,8 @@ const frontendPath = (...p) => path.join(__dirname, "../frontend", ...p);
 const app = express();
 const server = http.createServer(app);
 
-initWebSocket(server, sessionMiddleware);
+initIO(server, sessionMiddleware);
+initWebSocketHandlers();
 
 app.use(express.json());
 
@@ -88,6 +90,7 @@ app.delete("/api/game/end", authMiddleware, gameMiddleware, game.endGame);
 
 app.get("/api/game/board", authMiddleware, gameMiddleware, game.getGameboard);
 app.get("/api/game/hand", authMiddleware, gameMiddleware, game.getHand);
+app.get("/api/game/players", authMiddleware, gameMiddleware, game.getPlayers);
 
 // --------------------
 // 404

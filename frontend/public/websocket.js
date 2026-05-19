@@ -31,7 +31,7 @@ function initSocket() {
     socket.on("state_changed", ({ newState, board, handP1, handP2, energyP1, energyP2 }) => {
         console.log("State changed:", newState);
         window.currentState = newState;
-        
+
         if (board) {
             window.syncBoard(board);
         }
@@ -50,9 +50,9 @@ function initSocket() {
 
         const endTurnBtn = document.getElementById('end-turn-btn');
         if (endTurnBtn) {
-            const isMyPlacePhase = (window.mySide === 1 && newState === "P1_PLACE") || 
-                                   (window.mySide === -1 && newState === "P2_PLACE");
-            
+            const isMyPlacePhase = (window.mySide === 1 && newState === "P1_PLACE") ||
+                (window.mySide === -1 && newState === "P2_PLACE");
+
             endTurnBtn.style.display = isMyPlacePhase ? "block" : "none";
         }
     });
@@ -69,7 +69,7 @@ function initSocket() {
         console.log("Card placed:", userID, board, hand, energy);
         // Always update the board rendering for both players
         window.syncBoard(board);
-        
+
         if (userID === window.myUserID) {
             window.updateHand(hand);
             window.updateEnergy(energy);
@@ -90,5 +90,10 @@ function initSocket() {
         if (typeof window.processAttackQueue === "function") {
             window.processAttackQueue(battleLog);
         }
+    });
+
+    socket.on("game_ended", (data) => {
+        console.log("Game ended:", data);
+        window.location.href = '/';
     });
 }

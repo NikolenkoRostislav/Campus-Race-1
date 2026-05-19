@@ -3,6 +3,7 @@ const { AttackCommand, AttackCommandRegistry } = require("./internal/attackComma
 const { CardType } = require("./internal/card.js");
 const GameBoard = require("./internal/gameBoard.js");
 const PlayerInfo = require("./internal/playerInfo.js");
+const User = require("../database/models/user.js")
 
 class Game {
     constructor(p1Id, p2Id) {
@@ -27,6 +28,12 @@ class Game {
 
     getPlayer(side) {
         return this.players.get(side);
+    }
+
+    async getPlayerInfo(side) {
+        let user = await User.findById(this.getPlayer(side).id);
+        if (!user?.login) return null;
+        return { login: user.login, pfp_url: user.pfp_url, id: user.id };
     }
 
     damagePlayer(side, dmg) {

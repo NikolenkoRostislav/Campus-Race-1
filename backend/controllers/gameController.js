@@ -1,9 +1,39 @@
 const GameLoop = require("../game_engine/gameLoop.js");
 const LobbyController = require("./lobbyController.js");
-const { getIO } = require("../websockets/websocket.js");
+const { getIO } = require("../websockets/socketManager.js");
 
 class GameController {
+    // In retrospect it was a stupid decision to put room management here
     static rooms = new Map(); // key: roomID, val: gameLoop
+
+    static findRoomByUserID(userID) {
+        for (const [roomID, room] of GameController.rooms.entries()) {
+            const p1 = room.game.players.get(1)?.id;
+            const p2 = room.game.players.get(-1)?.id;
+
+            if (p1 === userID || p2 === userID) {
+                return roomID;
+            }
+        }
+        return null;
+    }
+
+    static deleteGameByUserID(userID) {
+        const roomID = GameController.findRoomByUserID(userID);
+        console.log("Deleting room", roomID);
+        if (!roomID) return false;
+
+        const room = GameController.rooms.get(roomID);
+
+        if (room) {
+            room.clearTimer?.();
+            room.emit("game_ended", { id: roomID });
+        }
+
+        GameController.rooms.delete(roomID);
+
+        return true;
+    }
 
     static sendToRoom(roomID, event, data) {
         const room = GameController.rooms.get(roomID);
@@ -50,7 +80,7 @@ class GameController {
             const gameLoop = new GameLoop(roomID, p1ID, p2ID);
 
             gameLoop.on("state_changed", (data) => {
-                GameController.sendToRoom(roomID, "state_changed", { 
+                GameController.sendToRoom(roomID, "state_changed", {
                     newState: data.newState,
                     board: data.board,
                     handP1: data.handP1,
@@ -62,6 +92,10 @@ class GameController {
             gameLoop.on("battle_completed", (data) => {
                 GameController.sendToRoom(roomID, "battle_completed", { battleLog: data.battleLog });
             });
+            gameLoop.on("game_ended", (data) => {
+                GameController.sendToRoom(roomID, "game_ended", data);
+                GameController.rooms.delete(roomID);
+            })
 
             GameController.rooms.set(roomID, gameLoop);
             GameController.sendToRoom(roomID, "game_started", { isCreatorFirst });
@@ -211,6 +245,26 @@ class GameController {
             return res.json({
                 hand: room.game.getPlayer(side).hand
             });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "something went wrong" });
+        }
+    }
+
+    static async getPlayers(req, res) {
+        try {
+            const { roomID } = req.query;
+            const userID = req.session.user.id;
+
+            const room = GameController.getRoomOrFail(roomID);
+            const side = GameController.getSide(roomID, userID);
+
+            const me = await room.game.getPlayerInfo(side);
+            const opponent = await room.game.getPlayerInfo(side * -1);
+
+            if (!(me && opponent)) return res.status(404).json({ message: "Can't find player info" });
+
+            return res.json({ me, opponent });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message: "something went wrong" });
