@@ -99,6 +99,8 @@ function initSocket() {
 
     socket.on("game_ended", (data) => {
         console.log("Game ended:", data);
-        window.location.href = '/';
+        if (!data?.winnerID) {
+            window.location.href = '/';
+        }
     });
 }
