@@ -94,7 +94,9 @@ class GameController {
             });
             gameLoop.on("game_ended", (data) => {
                 GameController.sendToRoom(roomID, "game_ended", data);
-                GameController.rooms.delete(roomID);
+                if (!data?.winnerID) {
+                    GameController.rooms.delete(roomID);
+                }
             })
 
             GameController.rooms.set(roomID, gameLoop);

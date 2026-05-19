@@ -100,7 +100,7 @@ class GameLoop extends EventEmitter {
         const didPlayerDie = log.find(obj => obj.Action === "PLAYER_DIE");
         if (didPlayerDie) {
             this.clearTimer();
-            this.emit("game_ended", { id: this.id, winner_id: this.game.getPlayer(-1).id });
+            this.emit("game_ended", { id: this.id, winnerID: this.game.getPlayer(-1).id });
             return;
         }
 
