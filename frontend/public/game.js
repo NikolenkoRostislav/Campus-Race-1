@@ -4,8 +4,19 @@
 window.currentRoomID = null;
 window.myUserID = null;
 window.mySide = null;
-window.currentState = null;
+/*window.currentState = null;*/
 window.isGameActive = false;
+
+let _internalState = null;
+Object.defineProperty(window, 'currentState', {
+    get: () => _internalState,
+    set: (value) => {
+        _internalState = value;
+        if (typeof updateTurnHighlight === 'function') {
+            updateTurnHighlight();
+        }
+    }
+});
 
 // Read room and side from URL (side is set when redirecting from the lobby)
 const urlParams = new URLSearchParams(window.location.search);
@@ -33,6 +44,9 @@ async function fetchClientIdentity() {
             window.myUserID = data.user.id;
             console.log("Identity verified. User ID:", window.myUserID);
 
+            const playerNameEl = document.getElementById('playerName');
+            if (playerNameEl) playerNameEl.textContent = data.user.login || "Player";
+
             // Connect WebSocket after we know who we are
             initSocket();
 
@@ -48,13 +62,45 @@ async function fetchClientIdentity() {
                 if (boardData.currentState) {
                     window.currentState = boardData.currentState;
                     console.log("Recovered match phase from backend:", window.currentState);
+
+                    const isMyPlacePhase = (window.mySide === 1 && window.currentState === "P1_PLACE") ||
+                                           (window.mySide === -1 && window.currentState === "P2_PLACE");
+                    
+                    if (isMyPlacePhase) {
+                        const endTurnBtn = document.getElementById('end-turn-btn');
+                        if (endTurnBtn) endTurnBtn.style.display = 'block';
+                    }
                 }
             }
+
+            fetchOpponentIdentity();
         } else {
             window.location.href = "/login";
         }
     } catch (e) {
         console.error("Failed to load player identity:", e);
+    }
+}
+
+async function fetchOpponentIdentity() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        let enemyID = urlParams.get("enemyID");
+
+        if (!enemyID) {
+            const { creatorID, opponentID } = await getLobbyMembers(window.currentRoomID);
+            enemyID = (creatorID === window.myUserID) ? opponentID : creatorID;
+        }
+
+        if (enemyID) {
+            const enemyData = await getUserByID(enemyID);
+            const opponentNameEl = document.getElementById('opponentName');
+            if (opponentNameEl) opponentNameEl.textContent = enemyData?.login || "Opponent";
+        }
+    } catch (e) {
+        console.error("Failed to load opponent identity:", e);
+        const opponentNameEl = document.getElementById('opponentName');
+        if (opponentNameEl) opponentNameEl.textContent = "Opponent";
     }
 }
 
@@ -579,6 +625,20 @@ async function processAttackQueue(attacksArray) {
             const containerId = (actionObj.Side === window.mySide) ? 'left-hp' : 'right-hp';
             updateHP(containerId, actionObj.NewHP);
             await sleep(150);
+
+            if (actionObj.NewHP <= 0) {
+                await sleep(500);
+
+                if (actionObj.Side === window.mySide) {
+                    if (typeof window.showGameOver === 'function') {
+                        window.showGameOver(false);
+                    }
+                } else {
+                    if (typeof window.showGameOver === 'function') {
+                        window.showGameOver(true);
+                    }
+                }
+            }
         }
     }
 
@@ -588,6 +648,69 @@ async function processAttackQueue(attacksArray) {
         syncBoard(window.pendingBoardSync);
         window.pendingBoardSync = null;
     }
+}
+
+// --- TURN HIGHLIGHT / END TURN BUTTON---
+function updateTurnHighlight() {
+    const playerNameEl = document.getElementById('playerName');
+    const opponentNameEl = document.getElementById('opponentName');
+    const endTurnBtn = document.getElementById('end-turn-btn');
+    
+    // Перевіряємо, чи існують елементи та чи завантажився стан гри
+    if (!playerNameEl || !opponentNameEl || !window.currentState) return;
+
+    // Визначаємо чий зараз хід по перших символах стану (P1 або P2)
+    const isP1Turn = window.currentState.startsWith("P1");
+    const isP2Turn = window.currentState.startsWith("P2");
+
+    // Визначаємо, чи це наш хід (ми = 1 і зараз хід P1, АБО ми = -1 і зараз хід P2)
+    const isMyTurn = (window.mySide === 1 && isP1Turn) || (window.mySide === -1 && isP2Turn);
+
+    // Додаємо або забираємо зелений клас
+    if (isMyTurn) {
+        playerNameEl.classList.add('active-turn');
+        opponentNameEl.classList.remove('active-turn');
+    } else {
+        playerNameEl.classList.remove('active-turn');
+        opponentNameEl.classList.add('active-turn');
+    }
+
+    if (endTurnBtn) {
+        const isMyPlacePhase = (window.mySide === 1 && window.currentState === "P1_PLACE") ||
+                               (window.mySide === -1 && window.currentState === "P2_PLACE");
+        
+        if (isMyPlacePhase) {
+            endTurnBtn.style.display = 'block';
+        } else {
+            endTurnBtn.style.display = 'none';
+        }
+    }
+}
+
+// --- GAME OVER ---
+
+window.showGameOver = function(isWinner) {
+    const overlay = document.getElementById('game-over-overlay');
+    const title = document.getElementById('gameOverTitle');
+    
+    if (!overlay || !title) return;
+
+    if (isWinner) {
+        title.textContent = "VICTORY!";
+        title.className = "game-over-title win-text";
+    } else {
+        title.textContent = "DEFEAT...";
+        title.className = "game-over-title lose-text";
+    }
+    
+    overlay.classList.add('visible');
+};
+
+const mainMenuBtn = document.getElementById('mainMenuBtn');
+if (mainMenuBtn) {
+    mainMenuBtn.onclick = () => {
+        window.location.href = '/';
+    };
 }
 
 // --- INIT ---
