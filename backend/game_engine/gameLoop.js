@@ -97,6 +97,12 @@ class GameLoop extends EventEmitter {
     handleP1Battle() {
         let log = this.game.battle(1);
         this.emit("battle_completed", { battleLog: log });
+        const didPlayerDie = log.find(obj => obj.Action === "PLAYER_DIE");
+        if (didPlayerDie) {
+            this.clearTimer();
+            this.emit("game_ended", { id: this.id, winner_id: this.game.getPlayer(-1).id });
+            return;
+        }
 
         this.timer = setTimeout(() => {
             this.game.turn++;
@@ -104,6 +110,7 @@ class GameLoop extends EventEmitter {
         }, BattleTime);
     }
 
+    // I know this code is terrible and repetitive but I don't want to break anything right now
     handleP2Draw() {
         this.timer = setTimeout(() => {
             this.game.getPlayer(-1).drawCard(false);
@@ -122,6 +129,12 @@ class GameLoop extends EventEmitter {
     handleP2Battle() {
         let log = this.game.battle(-1);
         this.emit("battle_completed", { battleLog: log });
+        const didPlayerDie = log.find(obj => obj.Action === "PLAYER_DIE");
+        if (didPlayerDie) {
+            this.clearTimer();
+            this.emit("game_ended", { id: this.id, winnerID: this.game.getPlayer(1).id });
+            return;
+        }
 
         this.timer = setTimeout(() => {
             this.game.turn++;

@@ -1,27 +1,41 @@
-const { Server } = require("socket.io");
+const { getIO } = require("./socketManager.js");
+const game = require("../controllers/gameController.js");
 
-let io;
+// userId → timeout (prevents instant game deletion on refresh/navigation)
+const disconnectTimers = new Map();
 
-function initWebSocket(server, sessionMiddleware) {
-    io = new Server(server, {
-        cors: { origin: "*" }, //I'll change this later
-    });
-
-    io.use((socket, next) => {
-        sessionMiddleware(socket.request, {}, next);
-    });
+function initWebSocketHandlers() {
+    const io = getIO();
 
     io.on("connection", (socket) => {
-        if (!socket.request.session?.user) return socket.disconnect();
-        const userId = socket.request.session.user.id;
-        if (!userId) return socket.disconnect();
-        socket.join(userId);
+        const user = socket.request.session?.user;
+        if (!user) return socket.disconnect();
+
+        socket.userId = user.id;
+        socket.join(user.id);
+
+        if (disconnectTimers.has(socket.userId)) {
+            clearTimeout(disconnectTimers.get(socket.userId));
+            disconnectTimers.delete(socket.userId);
+            console.log(`Reconnect detected: ${socket.userId}`);
+        }
+
+        socket.on("disconnect", () => {
+            const userId = socket.userId;
+
+            if (!userId) return;
+
+            console.log(`Disconnect detected: ${userId} (grace period started)`);
+
+            const timer = setTimeout(() => {
+                console.log(`Finalizing disconnect: ${userId}`);
+                game.deleteGameByUserID(userId);
+                disconnectTimers.delete(userId);
+            }, 5000);
+
+            disconnectTimers.set(userId, timer);
+        });
     });
 }
 
-function getIO() {
-    if (!io) throw new Error("Socket.io not initialized");
-    return io;
-}
-
-module.exports = { initWebSocket, getIO };
+module.exports = { initWebSocketHandlers };

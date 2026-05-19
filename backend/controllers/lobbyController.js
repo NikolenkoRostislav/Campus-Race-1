@@ -1,5 +1,5 @@
 const Lobby = require("../game_engine/lobby.js");
-const { getIO } = require("../websockets/websocket.js");
+const { getIO } = require("../websockets/socketManager.js");
 
 class LobbyController {
     static lobbies = new Map(); //key: roomID, val: Lobby
