@@ -50,7 +50,7 @@ class GameController {
             const gameLoop = new GameLoop(roomID, p1ID, p2ID);
 
             gameLoop.on("state_changed", (data) => {
-                GameController.sendToRoom(roomID, "state_changed", { 
+                GameController.sendToRoom(roomID, "state_changed", {
                     newState: data.newState,
                     board: data.board,
                     handP1: data.handP1,
@@ -211,6 +211,26 @@ class GameController {
             return res.json({
                 hand: room.game.getPlayer(side).hand
             });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ message: "something went wrong" });
+        }
+    }
+
+    static async getPlayers(req, res) {
+        try {
+            const { roomID } = req.query;
+            const userID = req.session.user.id;
+
+            const room = GameController.getRoomOrFail(roomID);
+            const side = GameController.getSide(roomID, userID);
+
+            const me = await room.game.getPlayerInfo(side);
+            const opponent = await room.game.getPlayerInfo(side * -1);
+
+            if (!(me && opponent)) return res.status(404).json({ message: "Can't find player info" });
+
+            return res.json({ me, opponent });
         } catch (err) {
             console.error(err);
             return res.status(500).json({ message: "something went wrong" });

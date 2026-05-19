@@ -130,3 +130,7 @@ async function getGameboard(roomID) {
 async function getHand(roomID) {
     return request(`/api/game/hand?roomID=${encodeURIComponent(roomID)}`);
 }
+
+async function getPlayers(roomID) {
+    return request(`/api/game/players?roomID=${encodeURIComponent(roomID)}`);
+}

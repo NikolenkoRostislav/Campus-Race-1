@@ -88,6 +88,7 @@ app.delete("/api/game/end", authMiddleware, gameMiddleware, game.endGame);
 
 app.get("/api/game/board", authMiddleware, gameMiddleware, game.getGameboard);
 app.get("/api/game/hand", authMiddleware, gameMiddleware, game.getHand);
+app.get("/api/game/players", authMiddleware, gameMiddleware, game.getPlayers);
 
 // --------------------
 // 404

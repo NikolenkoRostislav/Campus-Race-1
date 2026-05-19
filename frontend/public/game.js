@@ -38,6 +38,7 @@ async function fetchClientIdentity() {
 
             // Initial sync: hand and board from the server
             const handData = await getHand(window.currentRoomID);
+            await loadUsersData();
             if (handData?.hand) updateHand(handData.hand);
 
             const boardData = await getGameboard(window.currentRoomID);
@@ -191,7 +192,7 @@ function setupDeckInteractions() {
     if (freeDeck) {
         freeDeck.addEventListener('click', async () => {
             const isMyDrawPhase = (window.mySide === 1 && window.currentState === "P1_DRAW") ||
-                                  (window.mySide === -1 && window.currentState === "P2_DRAW");
+                (window.mySide === -1 && window.currentState === "P2_DRAW");
             if (!isMyDrawPhase) {
                 console.log("[DEBUG] Cannot draw: not your draw phase.");
                 return;
@@ -209,7 +210,7 @@ function setupDeckInteractions() {
     if (randomDeck) {
         randomDeck.addEventListener('click', async () => {
             const isMyDrawPhase = (window.mySide === 1 && window.currentState === "P1_DRAW") ||
-                                  (window.mySide === -1 && window.currentState === "P2_DRAW");
+                (window.mySide === -1 && window.currentState === "P2_DRAW");
             if (!isMyDrawPhase) {
                 console.log("[DEBUG] Cannot draw: not your draw phase.");
                 return;
@@ -248,7 +249,7 @@ function setupCardInteractions() {
             console.log(`[DEBUG] Slot click: ${slotIndex + 1}`);
 
             const isMyPlacePhase = (window.mySide === 1 && window.currentState === "P1_PLACE") ||
-                                   (window.mySide === -1 && window.currentState === "P2_PLACE");
+                (window.mySide === -1 && window.currentState === "P2_PLACE");
 
             if (!isMyPlacePhase) {
                 console.log("[DEBUG] Action blocked. Current phase:", window.currentState);
@@ -411,7 +412,7 @@ function highlightValidSlots() {
     });
 
     const isMyPlacePhase = (window.mySide === 1 && window.currentState === "P1_PLACE") ||
-                           (window.mySide === -1 && window.currentState === "P2_PLACE");
+        (window.mySide === -1 && window.currentState === "P2_PLACE");
     if (!isMyPlacePhase) return;
 
     // Red highlight: sacrifice on your occupied slots during your place phase
@@ -590,6 +591,15 @@ async function processAttackQueue(attacksArray) {
     }
 }
 
+async function loadUsersData() {
+    const playerAvatar = document.querySelector(".player-avatar");
+    const opponentAvatar = document.querySelector(".opponent-avatar");
+
+    result = await getPlayers(window.currentRoomID)
+
+    playerAvatar.style.backgroundImage = `url("${result.me.pfp_url}")`;
+    opponentAvatar.style.backgroundImage = `url("${result.opponent.pfp_url}")`;
+}
 // --- INIT ---
 setupCardInteractions();
 setupDeckInteractions();
