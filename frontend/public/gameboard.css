@@ -510,8 +510,8 @@ html, body {
     position: fixed;
     top: 0;
     left: 0;
-    width: 50vw;
-    height: 50vh;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.85); 
     display: flex;
     justify-content: center;
@@ -544,12 +544,11 @@ html, body {
 
 .game-over-title {
     font-family: 'SpongeBob', sans-serif;
-    font-size: calc(260 * var(--px)); 
-    letter-spacing: calc(6 * var(--px));
+    font-size: calc(130 * var(--px)); 
+    letter-spacing: calc(4 * var(--px));
     text-align: center;
     margin: 0;
-    
-    -webkit-text-stroke: calc(4 * var(--px)) black; 
+    -webkit-text-stroke: calc(3 * var(--px)) black; 
 }
 
 .game-over-title.win-text {
