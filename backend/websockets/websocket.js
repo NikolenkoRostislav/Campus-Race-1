@@ -1,7 +1,6 @@
 const { getIO } = require("./socketManager.js");
 const game = require("../controllers/gameController.js");
 
-// userId → timeout (prevents instant game deletion on refresh/navigation)
 const disconnectTimers = new Map();
 
 function initWebSocketHandlers() {
