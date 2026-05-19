@@ -1,0 +1,132 @@
+=========================================
+      WELCOME TO THE TAVERN GAME!
+=========================================
+
+In this guidebook, you can learn the rules of the game and get started. 
+
+THE GOAL
+The goal of the game is simple: reduce your opponent’s HP to 0. To do this, you place cards on the board and use them to attack.
+
+CARD STATS
+Each card has three main stats: HP, Damage, and Cost.
+• HP: Determines how much damage a card can take before it is destroyed. When a card is attacked, its HP is reduced. If it reaches 0, the card is removed from the board.
+• Damage (DMG): Determines how strong a card is when it attacks. A card will attack the enemy card directly in front of it. If there is no card in front, the damage is dealt directly to the enemy player instead. Any excess damage beyond what is needed to destroy a card does not carry over and is ignored.
+• Cost: Determines how much energy is needed to play the card.
+
+ENERGY SYSTEM
+Energy is gained ONLY by sacrificing cards already placed on the board. 
+• You can sacrifice free or weak cards to play stronger ones, or replace heavily damaged cards with better units. 
+• Each sacrificed card provides exactly 1 energy (with some special exceptions). 
+• Energy resets after your attack phase, so make sure to use it before the turn ends!
+
+GAME PHASES
+The game is divided into 6 phases:
+1. Player 1 Draws: Choose between drawing a random card or a guaranteed free card (Burger).
+2. Player 1 Places: Sacrifice cards to gain energy and place new cards on the board.
+3. Player 1 Attacks: Cards attack automatically based on their abilities.
+4. Player 2 Draws: Choose a random or guaranteed free card.
+5. Player 2 Places: Sacrifice and place new units.
+6. Player 2 Attacks: Cards attack automatically.
+
+=========================================
+          SPECIAL ABILITIES
+=========================================
+Some cards have special effects. Understanding them is important if you want to win!
+
+• Fly: Ignores the enemy card directly in front of it and attacks the enemy player directly.
+• Poison (Instakill): Instantly destroys any card it attacks, regardless of HP. If there is no card in front of it, it deals its standard damage directly to the enemy player.
+• 3 Energy: When sacrificed, this card grants 3 energy instead of the usual 1.
+• Double Attack: Attacks twice in a single attack phase. This allows it to destroy an enemy card first and then deal damage to the enemy player if the path becomes clear.
+• Left-Right Attack: Attacks the tiles to its left and right instead of the tile directly in front. It does not attack outside the board, so placing it at the edges will reduce its effectiveness.
+• Left-Right-Front Attack: Same as Left-Right Attack, but it also attacks the tile directly in front.
+• HP Buff: When placed, increases the HP of adjacent friendly cards by a specified amount.
+• Damage Buff: When placed, increases the damage of adjacent friendly cards by a specified amount.
+• Spawner: When placed, creates weaker units on adjacent tiles. If a tile is already occupied or outside the board boundaries, no unit will be spawned there.
+
+=========================================
+             CARD CATALOG
+=========================================
+
+--- FREE & TOKEN CARDS ---
+#1 Burger
+Cost: 0 | HP: 1 | DMG: 0
+Effect: Guaranteed free card. Used primarily as sacrifice fodder to get energy for other units.
+
+#21 Gary
+Cost: 0 | HP: 1 | DMG: 1
+
+#101 Bug
+Cost: 0 | HP: 1 | DMG: 1
+Effect: Token unit. Spawned by Plankton's effect. Cannot be drawn from the deck.
+
+--- TIER 1 CARDS (Cost: 1) ---
+#2 Burger Trio
+Cost: 1 | HP: 2 | DMG: 0
+Effect: [3 Energy] Gives 3 energy instead of 1 when sacrificed.
+
+#3 Old Man Jenkins
+Cost: 1 | HP: 1 | DMG: 2
+
+#4 Scviliam Fensison
+Cost: 1 | HP: 4 | DMG: 1
+
+#5 Pearl Krabs
+Cost: 1 | HP: 6 | DMG: 0
+
+#6 Flying Dutchman
+Cost: 1 | HP: 1 | DMG: 1
+Effect: [Left-Right Attack] Attacks the right and left enemy tiles instead of the front one.
+
+#7 Squidward
+Cost: 1 | HP: 1 | DMG: 1
+Effect: [Damage Buff] Gives adjacent friendly units +1 DMG when placed.
+
+#14 Dirty Bubble
+Cost: 1 | HP: 1 | DMG: 1
+Effect: [Fly] Ignores enemy cards, directly targeting the enemy player.
+
+--- TIER 2 CARDS (Cost: 2) ---
+#8 Barnacle Boy
+Cost: 2 | HP: 2 | DMG: 3
+
+#9 Mermaid Man
+Cost: 2 | HP: 3 | DMG: 2
+
+#10 Plankton
+Cost: 2 | HP: 2 | DMG: 1
+Effect: [Spawner] Spawns Bugs (1 HP / 1 DMG) in adjacent tiles if possible.
+
+#11 SpongeBob
+Cost: 2 | HP: 2 | DMG: 1
+Effect: [Poison] Immediately kills any card it attacks. Deals 1 DMG if hitting the player.
+
+#12 Patrick
+Cost: 2 | HP: 6 | DMG: 1
+Effect: [HP Buff] Adds +2 HP to adjacent friendly cards when placed.
+
+#13 Red Fish
+Cost: 2 | HP: 2 | DMG: 2
+Effect: [Fly] Ignores enemy cards, directly targeting the enemy player.
+
+#15 Mrs. Puff
+Cost: 2 | HP: 4 | DMG: 1
+Effect: [Fly] Ignores enemy cards, directly targeting the enemy player.
+
+--- TIER 3 & 4 CARDS (Cost: 3-4) ---
+#16 Man Ray
+Cost: 3 | HP: 6 | DMG: 4
+
+#17 Sandy Cheeks
+Cost: 3 | HP: 5 | DMG: 2
+Effect: [Double Attack] Attacks twice in a row.
+
+#18 King Neptune
+Cost: 3 | HP: 2 | DMG: 2
+Effect: [Left-Right-Front Attack] Attacks 3 tiles: front, left, and right.
+
+#19 Mr. Krabs
+Cost: 3 | HP: 4 | DMG: 1
+Effect: [Damage Buff] Adds +2 DMG to adjacent friendly cards when placed.
+
+#20 Larry the Lobster
+Cost: 4 | HP: 8 | DMG: 5

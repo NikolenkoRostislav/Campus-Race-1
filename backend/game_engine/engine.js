@@ -93,6 +93,7 @@ class Game {
         for (let x = 1; x <= 4; x++) {
             const attacker = this.gameBoard.get(x, side);
             if (!attacker) continue
+            if (attacker.dmg <= 0) continue;
 
             let card = CardCatalog.get(attacker.cardID);
             const CommandClass = AttackCommandRegistry[card.type] || AttackCommand;

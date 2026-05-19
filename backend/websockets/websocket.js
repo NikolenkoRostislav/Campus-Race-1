@@ -30,7 +30,7 @@ function initWebSocketHandlers() {
                 console.log(`Finalizing disconnect: ${userId}`);
                 game.deleteGameByUserID(userId);
                 disconnectTimers.delete(userId);
-            }, 5000);
+            }, 10000);
 
             disconnectTimers.set(userId, timer);
         });

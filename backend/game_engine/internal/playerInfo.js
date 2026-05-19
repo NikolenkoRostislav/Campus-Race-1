@@ -31,9 +31,16 @@ class PlayerInfo {
     }
 
     consumeCard(cardID) {
-        if (!this.hasCard(cardID)) return false
-        this.hand.splice(this.hand.indexOf(cardID), 1);
-        return true
+        const id = Number(cardID); 
+        
+        if (!this.hasCard(id)) return false;
+        const index = this.hand.lastIndexOf(id);
+        
+        if (index > -1) {
+            this.hand.splice(index, 1);
+        }
+        
+        return true;
     }
 
     drawCard(random) {

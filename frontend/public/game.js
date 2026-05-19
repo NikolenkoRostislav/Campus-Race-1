@@ -7,6 +7,32 @@ window.mySide = null;
 /*window.currentState = null;*/
 window.isGameActive = false;
 
+// --- FRONTEND CARD CATALOG ---
+const FRONTEND_CATALOG = {
+    1: { hp: 1, dmg: 0 },
+    2: { hp: 2, dmg: 0 },
+    3: { hp: 1, dmg: 2 },
+    4: { hp: 4, dmg: 1 },
+    5: { hp: 6, dmg: 0 },
+    6: { hp: 1, dmg: 1 },
+    7: { hp: 1, dmg: 1 },
+    8: { hp: 2, dmg: 3 },
+    9: { hp: 3, dmg: 2 },
+    10: { hp: 2, dmg: 1 },
+    11: { hp: 2, dmg: 1 },
+    12: { hp: 6, dmg: 1 },
+    13: { hp: 2, dmg: 2 },
+    14: { hp: 1, dmg: 1 },
+    15: { hp: 4, dmg: 1 },
+    16: { hp: 6, dmg: 4 },
+    17: { hp: 5, dmg: 2 },
+    18: { hp: 2, dmg: 2 },
+    19: { hp: 4, dmg: 1 },
+    20: { hp: 8, dmg: 5 },
+    21: { hp: 1, dmg: 1 },
+    101: { hp: 1, dmg: 1 }
+};
+
 let _internalState = null;
 Object.defineProperty(window, 'currentState', {
     get: () => _internalState,
@@ -64,6 +90,8 @@ async function fetchClientIdentity() {
                     window.currentState = boardData.currentState;
                     console.log("Recovered match phase from backend:", window.currentState);
 
+                    if (typeof window.startLocalTimer === 'function') window.startLocalTimer(window.currentState);
+
                     const isMyPlacePhase = (window.mySide === 1 && window.currentState === "P1_PLACE") ||
                                            (window.mySide === -1 && window.currentState === "P2_PLACE");
                     
@@ -109,7 +137,7 @@ window.isBattleAnimating = false;
 window.pendingBoardSync = null;
 
 function syncBoard(boardObject) {
-    // During battle animations, defer board updates until the sequence finishes
+    // Під час бойових анімацій відкладаємо оновлення столу
     if (window.isBattleAnimating) {
         window.pendingBoardSync = boardObject;
         return;
@@ -139,26 +167,35 @@ function syncBoard(boardObject) {
         const slot = getCardSlot(side, index);
         if (!slot) continue;
 
+        let boardCard;
+
         if (currentCards.has(key)) {
-            // Card already on the board — leave it as-is
+            // КЛЮЧОВА ЗМІНА: якщо картка вже є, ми беремо її для оновлення статів
+            boardCard = currentCards.get(key);
             currentCards.delete(key);
         } else {
-            // New card from the server — render it
+            // Нова картка з сервера — створюємо з нуля
             slot.classList.add('occupied');
-            const boardCard = document.createElement('div');
+            boardCard = document.createElement('div');
             boardCard.classList.add('board-card');
 
             const cardID = typeof cardData === 'object' ? (cardData.id || cardData.cardID) : cardData;
-            if (cardID === 1 || String(cardID).includes('free')) {
-                boardCard.style.backgroundImage = "url('assets/free_card.png')";
-            } else {
-                boardCard.style.backgroundImage = "url('assets/card_suit.png')";
-            }
+            boardCard.style.backgroundImage = getCardImageURL(cardID);
             slot.appendChild(boardCard);
+        }
+
+        // Оновлюємо ХП та Демедж кожного разу, коли приходить свіжий стан з бекенду
+        if (typeof cardData === 'object') {
+            const hp = cardData.hp !== undefined ? cardData.hp : cardData.health;
+            const dmg = cardData.dmg !== undefined ? cardData.dmg : cardData.damage;
+            
+            if (hp !== undefined && dmg !== undefined) {
+                updateCardStats(boardCard, hp, dmg);
+            }
         }
     }
 
-    // Remove only cards that are no longer on the backend board
+    // Видаляємо картки, які зникли з бекенду (наприклад, померли)
     currentCards.forEach((cardEl) => {
         const slot = cardEl.parentElement;
         if (slot) {
@@ -206,6 +243,39 @@ function updateHP(containerId, hpAmount) {
     }
 }
 
+// --- CARD IMAGE HELPER ---
+function getCardImageURL(cardID) {
+    if (!cardID) return "url('assets/card_suit.png')";
+    
+    return `url('assets/cards/${cardID}.png')`;
+}
+
+function updateCardStats(cardEl, hp, dmg) {
+    let dmgEl = cardEl.querySelector('.card-dmg');
+    let hpEl = cardEl.querySelector('.card-hp');
+
+    if (!dmgEl) {
+        dmgEl = document.createElement('div');
+        dmgEl.classList.add('card-stat', 'card-dmg');
+        cardEl.appendChild(dmgEl);
+    }
+    if (!hpEl) {
+        hpEl = document.createElement('div');
+        hpEl.classList.add('card-stat', 'card-hp');
+        cardEl.appendChild(hpEl);
+    }
+
+    if (dmg <= 0) {
+        dmgEl.style.display = 'none';
+    } else {
+        dmgEl.style.display = 'flex';
+        dmgEl.textContent = dmg;
+    }
+
+    hpEl.textContent = hp;
+}
+
+
 // --- DECK INTERACTION ---
 function showCardReveal(cardID, onCompleteCallback) {
     const overlay = document.getElementById('card-reveal-overlay');
@@ -213,11 +283,13 @@ function showCardReveal(cardID, onCompleteCallback) {
     if (!overlay || !cardEl) return;
 
     // Pick art for the reveal overlay
-    if (cardID === 1 || String(cardID).includes('free')) {
-        cardEl.style.backgroundImage = "url('assets/free_card.png')";
-    } else {
-        // Card back for now; replace with url(`assets/cards/${cardID}.png`) when art exists
-        cardEl.style.backgroundImage = "url('assets/card_suit.png')";
+    cardEl.style.backgroundImage = getCardImageURL(cardID);
+
+    // --- НОВИЙ БЛОК: Додаємо характеристики на велику карту ---
+    cardEl.innerHTML = ''; 
+    const baseStats = FRONTEND_CATALOG[cardID];
+    if (baseStats) {
+        updateCardStats(cardEl, baseStats.hp, baseStats.dmg);
     }
 
     overlay.classList.add('visible');
@@ -372,10 +444,32 @@ function updateHand(handArray) {
     const handContainer = document.getElementById('player-hand');
     if (!handContainer) return;
 
-    handContainer.innerHTML = '';
     const cardCount = handArray.length;
-    if (cardCount <= 0) return;
+    
+    // Якщо рука порожня — просто очищаємо
+    if (cardCount <= 0) {
+        handContainer.innerHTML = '';
+        return;
+    }
 
+    // 1. Беремо всі існуючі HTML-карти в руці
+    const existingCards = Array.from(handContainer.querySelectorAll('.hand-card'));
+
+    // 2. Якщо карт на екрані БІЛЬШЕ, ніж прийшло з сервера (наприклад, поставили на стіл) — видаляємо зайві з кінця
+    while (existingCards.length > cardCount) {
+        const cardToRemove = existingCards.pop();
+        cardToRemove.remove();
+    }
+
+    // 3. Якщо карт МЕНШЕ (наприклад, витягнули з колоди) — створюємо лише відсутні слоти
+    while (existingCards.length < cardCount) {
+        const newCard = document.createElement('div');
+        newCard.classList.add('hand-card');
+        handContainer.appendChild(newCard);
+        existingCards.push(newCard);
+    }
+
+    // 4. Тепер просто оновлюємо дані на ІСНУЮЧИХ елементах (ніякого innerHTML = '')
     const maxTotalAngle = 40;
     const preferredAngleStep = 10;
     const angleStep = cardCount > 1
@@ -390,8 +484,11 @@ function updateHand(handArray) {
     const middleIndex = (cardCount - 1) / 2;
 
     for (let i = 0; i < cardCount; i++) {
-        const card = document.createElement('div');
-        card.classList.add('hand-card');
+        // Беремо вже існуючий або щойно створений елемент
+        const card = existingCards[i];
+
+        // Про всяк випадок знімаємо виділення, щоб карти не зависали збільшеними
+        card.classList.remove('selected');
 
         const offset = i - middleIndex;
         const angle = offset * angleStep;
@@ -400,21 +497,21 @@ function updateHand(handArray) {
         const cardData = handArray[i];
         const cardID = typeof cardData === 'object' ? (cardData.id || cardData.cardID) : cardData;
 
-        // Card art (free vs random/back)
-        if (cardID === 1 || String(cardID).includes('free')) {
-            card.style.backgroundImage = "url('assets/free_card.png')";
-        } else {
-            card.style.backgroundImage = "url('assets/card_suit.png')";
+        // Встановлюємо правильний кастомний арт
+        card.style.backgroundImage = getCardImageURL(cardID);
+
+        // Підтягуємо характеристики на карту
+        const baseStats = FRONTEND_CATALOG[cardID];
+        if (baseStats) {
+            updateCardStats(card, baseStats.hp, baseStats.dmg);
         }
 
-        // Fan layout: numeric CSS vars (no px) so --px scaling in CSS works
+        // Плавно пересуваємо карту на нову позицію
         card.setAttribute('data-card-id', cardID);
         card.style.setProperty('--card-angle', `${angle}deg`);
         card.style.setProperty('--card-y', yOffset);
         card.style.setProperty('--overlap', overlap);
         card.style.zIndex = i;
-
-        handContainer.appendChild(card);
     }
 }
 
@@ -431,6 +528,11 @@ function selectCard(card) {
     selectedCard = card;
     selectedCard.classList.add('selected');
     highlightValidSlots();
+
+    const placeHint = document.getElementById('place-hint');
+    if (placeHint) {
+        placeHint.innerHTML = 'Place a card <br> <span style="margin-top: 2px;">→</span>';
+    }
 }
 
 // --- KEYBOARD NAVIGATION ---
@@ -485,8 +587,12 @@ function clearSelection() {
         selectedCard.classList.remove('selected');
         selectedCard = null;
     }
-    // Green highlights drop when selection clears; red sacrifice highlights stay
     highlightValidSlots();
+
+    const placeHint = document.getElementById('place-hint');
+    if (placeHint) {
+        placeHint.innerHTML = 'Choose a card <br> <span>↓</span>';
+    }
 }
 
 // --- ATTACK ANIMATIONS ---
@@ -602,13 +708,38 @@ async function processAttackQueue(attacksArray) {
 
     if (!attacksArray?.length) return;
 
-    // Block board sync until all battle animations finish
     window.isBattleAnimating = true;
 
     for (const actionObj of attacksArray) {
         if (actionObj.Action === "ATTACK") {
             await playAttackAnimation(actionObj.AttackerCoord, actionObj.TargetCoord);
-        } else if (actionObj.Action === "CARD_DIE") {
+        } 
+        // --- НОВИЙ БЛОК: ОНОВЛЕННЯ ХП КАРТКИ ПРИ УДАРІ ---
+        else if (actionObj.Action === "CARD_HP_UPDATE") {
+            const targetSlot = getCardSlotFromBackendCoord(actionObj.TargetCoord);
+            if (targetSlot) {
+                const targetCard = targetSlot.querySelector('.board-card');
+                if (targetCard) {
+                    let hpEl = targetCard.querySelector('.card-hp');
+                    
+                    // Якщо елемента .card-hp ще немає на картці, створюємо його на льоту
+                    if (!hpEl) {
+                        hpEl = document.createElement('div');
+                        hpEl.classList.add('card-stat', 'card-hp');
+                        targetCard.appendChild(hpEl);
+                    }
+                    
+                    // Оновлюємо значення ХП новими даними з бекенду
+                    hpEl.textContent = actionObj.NewHP;
+                    
+                    // Запускаємо твою анімацію спалаху
+                    hpEl.classList.add('flash-damage');
+                    setTimeout(() => hpEl.classList.remove('flash-damage'), 300);
+                }
+            }
+            await sleep(150);
+        }
+        else if (actionObj.Action === "CARD_DIE") {
             const deadSlot = getCardSlotFromBackendCoord(actionObj.TargetCoord || actionObj.Coord);
             if (deadSlot) {
                 const deadCard = deadSlot.querySelector('.board-card');
@@ -629,21 +760,15 @@ async function processAttackQueue(attacksArray) {
 
             if (actionObj.NewHP <= 0) {
                 await sleep(500);
-
                 if (actionObj.Side === window.mySide) {
-                    if (typeof window.showGameOver === 'function') {
-                        window.showGameOver(false);
-                    }
+                    if (typeof window.showGameOver === 'function') window.showGameOver(false);
                 } else {
-                    if (typeof window.showGameOver === 'function') {
-                        window.showGameOver(true);
-                    }
+                    if (typeof window.showGameOver === 'function') window.showGameOver(true);
                 }
             }
         }
     }
 
-    // Apply any board update that arrived mid-battle
     window.isBattleAnimating = false;
     if (window.pendingBoardSync) {
         syncBoard(window.pendingBoardSync);
@@ -657,17 +782,19 @@ function updateTurnHighlight() {
     const opponentNameEl = document.getElementById('opponentName');
     const endTurnBtn = document.getElementById('end-turn-btn');
     
-    // Перевіряємо, чи існують елементи та чи завантажився стан гри
+    const freeDeck = document.getElementById('free-deck');
+    const randomDeck = document.getElementById('random-deck');
+    
+    // Елементи підказок
+    const drawHint = document.getElementById('draw-hint');
+    const placeHint = document.getElementById('place-hint');
+    
     if (!playerNameEl || !opponentNameEl || !window.currentState) return;
 
-    // Визначаємо чий зараз хід по перших символах стану (P1 або P2)
     const isP1Turn = window.currentState.startsWith("P1");
     const isP2Turn = window.currentState.startsWith("P2");
-
-    // Визначаємо, чи це наш хід (ми = 1 і зараз хід P1, АБО ми = -1 і зараз хід P2)
     const isMyTurn = (window.mySide === 1 && isP1Turn) || (window.mySide === -1 && isP2Turn);
 
-    // Додаємо або забираємо зелений клас
     if (isMyTurn) {
         playerNameEl.classList.add('active-turn');
         opponentNameEl.classList.remove('active-turn');
@@ -676,10 +803,39 @@ function updateTurnHighlight() {
         opponentNameEl.classList.add('active-turn');
     }
 
+    const isMyDrawPhase = (window.mySide === 1 && window.currentState === "P1_DRAW") ||
+                          (window.mySide === -1 && window.currentState === "P2_DRAW");
+    
+    const isMyPlacePhase = (window.mySide === 1 && window.currentState === "P1_PLACE") ||
+                           (window.mySide === -1 && window.currentState === "P2_PLACE");
+
+    // Управління колодами та підказкою DRAW
+    if (freeDeck && randomDeck) {
+        if (isMyDrawPhase) {
+            freeDeck.classList.remove('disabled');
+            randomDeck.classList.remove('disabled');
+            if (drawHint) drawHint.classList.add('visible');
+        } else {
+            freeDeck.classList.add('disabled');
+            randomDeck.classList.add('disabled');
+            if (drawHint) drawHint.classList.remove('visible');
+        }
+    }
+
+    // Управління підказкою PLACE
+    if (placeHint) {
+        if (isMyPlacePhase) {
+            placeHint.classList.add('visible');
+            // Якщо хід тільки почався і карта ще не вибрана — скидаємо текст
+            if (!selectedCard) {
+                placeHint.innerHTML = 'Choose a card <br> <span>↓</span>';
+            }
+        } else {
+            placeHint.classList.remove('visible');
+        }
+    }
+
     if (endTurnBtn) {
-        const isMyPlacePhase = (window.mySide === 1 && window.currentState === "P1_PLACE") ||
-                               (window.mySide === -1 && window.currentState === "P2_PLACE");
-        
         if (isMyPlacePhase) {
             endTurnBtn.style.display = 'block';
         } else {
@@ -718,11 +874,93 @@ async function loadUsersData() {
     const playerAvatar = document.querySelector(".player-avatar");
     const opponentAvatar = document.querySelector(".opponent-avatar");
 
-    result = await getPlayers(window.currentRoomID)
+    const defaultPlayerUrl = "https://i.pinimg.com/736x/16/2a/9c/162a9c07ec2e669d6de08a37a40bc282.jpg"; 
+    const defaultOpponentUrl = "https://i.pinimg.com/736x/16/2a/9c/162a9c07ec2e669d6de08a37a40bc282.jpg";
 
-    playerAvatar.style.backgroundImage = `url("${result.me.pfp_url}")`;
-    opponentAvatar.style.backgroundImage = `url("${result.opponent.pfp_url}")`;
+    try {
+        const result = await getPlayers(window.currentRoomID);
+        
+        const myAvatar = (result && result.me && result.me.pfp_url) ? result.me.pfp_url : defaultPlayerUrl;
+        const enemyAvatar = (result && result.opponent && result.opponent.pfp_url) ? result.opponent.pfp_url : defaultOpponentUrl;
+
+        playerAvatar.style.backgroundImage = `url("${myAvatar}")`;
+        opponentAvatar.style.backgroundImage = `url("${enemyAvatar}")`;
+        
+    } catch (error) {
+        console.error("Cannot load player avatars", error);
+        playerAvatar.style.backgroundImage = `url("${defaultPlayerUrl}")`;
+        opponentAvatar.style.backgroundImage = `url("${defaultOpponentUrl}")`;
+    }
 }
+
+// --- TIMER ---
+
+const TIME_BATTLE = 5000;
+const TIME_DRAW = 15000;
+const TIME_PLACE = 60000;
+
+let localTimerInterval = null;
+
+window.startLocalTimer = function(stateName) {
+    const timerEl = document.getElementById('game-timer');
+    if (!timerEl || !stateName) return;
+
+    // --- 1. ПЕРЕВІРКА НА ФАЗУ БОЮ ---
+    if (stateName.includes("BATTLE")) {
+        timerEl.style.display = 'none';
+        
+        if (localTimerInterval) {
+            clearInterval(localTimerInterval);
+            localTimerInterval = null;
+        }
+        return;
+    } else {
+        timerEl.style.display = 'block';
+    }
+
+    let durationMs = 0;
+
+    if (stateName.includes("DRAW")) {
+        durationMs = TIME_DRAW;
+    } else if (stateName.includes("PLACE")) {
+        durationMs = TIME_PLACE;
+    }
+
+    if (localTimerInterval) {
+        clearInterval(localTimerInterval);
+        localTimerInterval = null;
+    }
+
+    if (durationMs <= 0) {
+        timerEl.textContent = '';
+        return;
+    }
+
+    const endTime = Date.now() + durationMs;
+
+    const tick = () => {
+        const remainingMs = endTime - Date.now();
+        
+        if (remainingMs <= 0) {
+            timerEl.textContent = "0";
+            timerEl.classList.remove('hurry');
+            clearInterval(localTimerInterval);
+            return;
+        }
+
+        const sec = Math.ceil(remainingMs / 1000);
+        timerEl.textContent = sec;
+
+        if (sec <= 10) {
+            timerEl.classList.add('hurry');
+        } else {
+            timerEl.classList.remove('hurry');
+        }
+    };
+
+    tick();
+    localTimerInterval = setInterval(tick, 100);
+};
 
 // --- INIT ---
 setupCardInteractions();

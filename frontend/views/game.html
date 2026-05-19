@@ -11,6 +11,9 @@
 <body>
 
     <main id="game-table">
+        <!-- Game timer -->
+        <div id="game-timer" class="game-timer"></div>
+
         <!-- Player's profile (avatar, HP) -->
         <div class="profile-wrapper left-side">
             <div class="profile-row">
@@ -62,6 +65,14 @@
         <div id="card-reveal-overlay">
             <div id="revealed-card"></div>
             <div class="reveal-hint">Click to take into hand</div>
+        </div>
+
+        <div id="draw-hint" class="action-hint deck-hint">
+            Draw a card <br> <span>↓</span>
+        </div>
+
+        <div id="place-hint" class="action-hint hand-hint">
+            Choose a card <br> <span>↓</span>
         </div>
 
         <!-- End Turn Button -->

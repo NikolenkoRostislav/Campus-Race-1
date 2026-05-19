@@ -32,6 +32,11 @@ function initSocket() {
         console.log("State changed:", newState);
         window.currentState = newState;
 
+        // Timer start should be triggered on every state change to ensure it stays in sync with the backend
+        if (typeof window.startLocalTimer === 'function') {
+            window.startLocalTimer(newState);
+        }
+
         if (board) {
             window.syncBoard(board);
         }

@@ -107,14 +107,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "/login";
                 return;
             }
+            
             const userInfo = await getUserByID(data.user.id);
-
             userIDText.textContent = userInfo.login;
 
-            if (data.user.pfp_url) {
+            const defaultAvatarUrl = "https://i.pinimg.com/736x/16/2a/9c/162a9c07ec2e669d6de08a37a40bc282.jpg";
+
+            if (userInfo && userInfo.pfp_url) {
                 userAvatar.src = userInfo.pfp_url;
-                userAvatar.style.display = "block";
+            } else {
+                userAvatar.src = defaultAvatarUrl;
             }
+            
+            userAvatar.style.display = "block";
+
         } catch (e) {
             console.error("Auth check failed:", e);
         }
