@@ -20,12 +20,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     // --------------------
 
     let contextCreatorID = null;
+    let contextOpponentID = null;
     
 
     async function refreshLobby() {
         try {
             const { creatorID, opponentID } = await getLobbyMembers(roomID);
             contextCreatorID = creatorID;
+            contextOpponentID = opponentID;
+
             const creator = await getUserByID(creatorID);
             username1.textContent = creator.login;
 
@@ -82,7 +85,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const mySide = (myID === contextCreatorID) ? (isCreatorFirst ? 1 : -1) : (isCreatorFirst ? -1 : 1);
 
-            window.location.href = `/game?roomID=${roomID}&side=${mySide}`;
+            const enemyID = (myID === contextCreatorID) ? contextOpponentID : contextCreatorID;
+
+            window.location.href = `/game?roomID=${roomID}&side=${mySide}&enemyID=${enemyID}`;
         } catch (err) {
             console.error("Redirection parsing error:", err);
             window.location.href = `/game?roomID=${roomID}`;

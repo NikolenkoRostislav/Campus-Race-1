@@ -44,21 +44,44 @@ html, body {
 }
 
 /* Profile and HP UI */
-.profile-container {
+.profile-wrapper {
     position: absolute;
     top: calc(10 * var(--px));
     display: flex;
-    align-items: center; 
+    flex-direction: column;
+    /*align-items: center;*/
     gap: calc(5 * var(--px));
     z-index: 50;
 }
 
 .left-side {
     left: calc(10 * var(--px));
+    align-items: flex-start;
 }
 
 .right-side {
     right: calc(10 * var(--px));
+    align-items: flex-end;
+}
+
+.profile-row {
+    display: flex;
+    align-items: center;
+    gap: calc(5 * var(--px));
+}
+
+.player-name {
+    font-family: 'SpongeBob', sans-serif;
+    font-size: calc(24 * var(--px));
+    color: white;
+    text-shadow: 0 0 calc(3 * var(--px)) rgba(0,0,0, 0.8);
+    letter-spacing: 1px;
+}
+
+.player-name.active-turn {
+    color: #33ff41;
+    text-shadow: 0 0 calc(15 * var(--px)) rgba(51, 255, 65, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.9);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .hp-container {
@@ -287,7 +310,7 @@ html, body {
 #energy-counter {
     position: absolute;
     
-    top: 17%;
+    top: 22%;
     transform: translateY(-50%); 
     right: calc(5 * var(--px));  
     
@@ -443,27 +466,110 @@ html, body {
 /* End turn button */
 .end-turn-btn {
     position: absolute;
-    right: calc(30 * var(--px));
-    top: 50%;
-    transform: translateY(-50%);
-    
-    padding: calc(15 * var(--px)) calc(25 * var(--px));
-    font-family: 'SpongeBob', sans-serif;
-    font-size: calc(28 * var(--px));
-    background-color: #33ff41;
-    color: white;
-    
-    border: calc(4 * var(--px)) solid white;
-    border-radius: calc(12 * var(--px));
-    box-shadow: 0 calc(5 * var(--px)) calc(15 * var(--px)) rgba(0,0,0, 0.5);
+    left: 50%;
+    top: 90%;
+    transform: translate(-50%, -50%);
+
+    width: calc(250 * var(--px));
+    height: calc(90 * var(--px));
+
+    background-color: transparent;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+
     cursor: pointer;
     z-index: 100;
-    
-    display: none;
+    display: none; /* Залишаємо, бо кнопка з'являється через JS */
     transition: transform 0.2s ease, filter 0.2s ease;
+    
 }
 
 .end-turn-btn:hover {
-    transform: translateY(-50%) scale(1.1);
+    transform:  translate(-50%, -50%) scale(1.05);
+    filter: brightness(1.2);
+}
+
+/* =========================================
+   GAME OVER OVERLAY (ЧИСТИЙ ТЕКСТ ТА КНОПКА)
+========================================= */
+.game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85); /* Гарне затемнення всього ігрового поля */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Перекриває абсолютно все */
+    
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.game-over-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Панель тепер повністю прозора й адаптивна, вона служить суто для центрування */
+.game-over-panel {
+    width: 100%;
+    height: 100%;
+    background: transparent !important; /* Гарантуємо відсутність будь-яких плажок */
+    border: none !important;
+    box-shadow: none !important;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(50 * var(--px)); /* Відступ між гігантським текстом та кнопкою */
+}
+
+/* Гігантський текст по центру екрана */
+.game-over-title {
+    font-family: 'SpongeBob', sans-serif;
+    font-size: calc(260 * var(--px)); /* Величезний розмір тексту */
+    letter-spacing: calc(6 * var(--px));
+    text-align: center;
+    margin: 0;
+    
+    /* Товста чорна обводка літер, щоб текст читався ідеально */
+    -webkit-text-stroke: calc(4 * var(--px)) black; 
+}
+
+/* Ефект золотого світіння для перемоги */
+.game-over-title.win-text {
+    color: #fad689; 
+    text-shadow: 0 0 calc(40 * var(--px)) rgba(250, 214, 137, 0.8);
+}
+
+/* Ефект криваво-червоного світіння для поразки */
+.game-over-title.lose-text {
+    color: #ff3333; 
+    text-shadow: 0 0 calc(40 * var(--px)) rgba(255, 51, 51, 0.6);
+}
+
+/* Кнопка під текстом */
+.to-menu-btn {
+    width: calc(340 * var(--px));
+    height: calc(95 * var(--px));
+    
+    background-color: transparent;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.to-menu-btn:hover {
+    transform: scale(1.05);
     filter: brightness(1.2);
 }

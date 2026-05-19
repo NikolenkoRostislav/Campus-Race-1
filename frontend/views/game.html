@@ -12,14 +12,20 @@
 
     <main id="game-table">
         <!-- Player's profile (avatar, HP) -->
-        <div class="profile-container left-side">
-            <div class="avatar opponent-avatar"></div>
-            <div id="left-hp" class="hp-container"></div>
+        <div class="profile-wrapper left-side">
+            <div class="profile-row">
+                <div class="avatar player-avatar"></div>
+                <div id="left-hp" class="hp-container"></div>
+            </div>
+            <div class="player-name" id="playerName">My Username</div>
         </div>
 
-        <div class="profile-container right-side">
-            <div id="right-hp" class="hp-container"></div>
-            <div class="avatar player-avatar"></div>
+        <div class="profile-wrapper right-side">
+            <div class="profile-row">
+                <div id="right-hp" class="hp-container"></div>
+                <div class="avatar opponent-avatar"></div>
+            </div>
+            <div class="player-name" id="opponentName">Opponent Name</div>
         </div>
 
         <!-- Opponent's front row -->
@@ -59,9 +65,25 @@
         </div>
 
         <!-- End Turn Button -->
-        <button id="end-turn-btn" class="end-turn-btn">End Turn</button>
+        <button id="end-turn-btn" class="end-turn-btn"
+            style="background-image: url('/assets/EndTurn.png');">
+            
+        </button>
+
+        <div id="game-over-overlay" class="game-over-overlay">
+            <div class="game-over-panel" id="gameOverPanel">
+                
+                <h1 id="gameOverTitle" class="game-over-title">VICTORY</h1>
+                
+                <button id="mainMenuBtn" class="to-menu-btn" 
+                    style="background-image: url('/assets/MainMenu.png');">
+                </button>    
+            </div>
+        </div>
 
     </main>
+
+    
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/api.js"></script>
